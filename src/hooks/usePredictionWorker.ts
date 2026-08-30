@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchPredictionNgrams } from '../data/languageAssets'
+import { getSuggestionUi } from '../utils/applySuggestionCasing'
 import type { AnalyzedContext } from '../utils/contextAnalyzer'
 import type { SessionLearnEvent } from '../utils/wordMemory'
 import PredictionWorker from '../workers/prediction.worker.ts?worker'
@@ -135,10 +136,12 @@ export function usePredictionWorker() {
           id,
           type: 'predict',
           mode: context.mode,
+          channel: getSuggestionUi(context) === 'popover' ? 'popover' : 'ghost',
           prefix: context.prefix,
           bigramKey: context.bigramKey,
           trigramKey: context.trigramKey,
           fourgramKey: context.fourgramKey,
+          sentenceTokens: context.sentenceTokens,
           limit,
         })
       })

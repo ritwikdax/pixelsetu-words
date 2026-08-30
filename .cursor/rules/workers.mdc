@@ -11,7 +11,7 @@ Vite workers: `import X from '../workers/….ts?worker'` then `new X()` (bundled
 | Worker | Hook | Job |
 |--------|------|-----|
 | `dictionary.worker.ts` | `useDictionaryWorker` | Prefix search on ImageKit `dictionary.txt` (2-letter buckets) |
-| `prediction.worker.ts` | `usePredictionWorker` | Next-word / prefix from grammar rules, ImageKit ngrams, and personal graph |
+| `prediction.worker.ts` | `usePredictionWorker` | Popover prefix: ngrams + personal graph. Ghost next-word: sentence attention (no personal graph). |
 | `agent.worker.ts` | `useAgentWorker` | Gemini harness; abort; host-tool round trip |
 
 Fetch language assets on the main thread (`languageAssets.ts`), then `postMessage({ type: 'init' })` into the worker. Do not `fetch()` ImageKit from the worker (that hung the suggestion popover).

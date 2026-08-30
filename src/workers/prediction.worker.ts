@@ -1,5 +1,13 @@
 import type { PredictionNgramPayload } from '../data/languageAssets'
 import { grammarContinuations } from '../data/grammarRules'
+import {
+  attentionWeights,
+  ghostDisplayWord,
+  normalizeGhostToken,
+  repeatPenalty,
+  SENTENCE_STARTERS,
+  slotBonus,
+} from '../utils/ghostAttention'
 
 export type PredictionSource = 'ngram' | 'trigram' | 'personal' | 'ml' | 'grammar'
 
@@ -12,14 +20,18 @@ export interface PredictionInitMessage {
   data: PredictionNgramPayload
 }
 
+export type PredictionChannel = 'ghost' | 'popover'
+
 export interface PredictionRequest {
   id: number
   type: 'predict'
   mode: 'next-word' | 'prefix'
+  channel: PredictionChannel
   prefix: string
   bigramKey: string | null
   trigramKey: string | null
   fourgramKey: string | null
+  sentenceTokens?: string[]
   limit?: number
 }
 
@@ -83,6 +95,7 @@ const STORE = 'bigrams'
 const DEFAULT_LIMIT = 8
 
 let ngramData: NgramData = { bigrams: {}, trigrams: {}, unigrams: {} }
+let unigramTotal = 0
 let dbPromise: Promise<IDBDatabase> | null = null
 const sessionGraph = new Map<string, Record<string, GraphEdge>>()
 
@@ -353,12 +366,137 @@ async function predict(request: PredictionRequest): Promise<PredictionCandidate[
   return rankPool(pool, limit)
 }
 
+function successorMass(map: Record<string, number> | undefined): number {
+  if (!map) return 0
+  let total = 0
+  for (const value of Object.values(map)) total += value
+  return total
+}
+
+function condProb(map: Record<string, number> | undefined, word: string): number {
+  if (!map) return 0
+  const mass = successorMass(map)
+  if (mass <= 0) return 0
+  return (map[word] ?? 0) / mass
+}
+
+function unigramProb(word: string): number {
+  if (unigramTotal <= 0) return 0
+  return (ngramData.unigrams[word] ?? 0) / unigramTotal
+}
+
+function topSuccessors(map: Record<string, number> | undefined, count: number): string[] {
+  if (!map) return []
+  return Object.entries(map)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, count)
+    .map(([word]) => word)
+}
+
+function grammarScoreFor(
+  word: string,
+  bigramKey: string | null,
+  trigramKey: string | null,
+): number {
+  const match = grammarContinuations(bigramKey, trigramKey).find((entry) => entry.word === word)
+  return match?.score ?? 0
+}
+
+function predictGhost(request: PredictionRequest): PredictionCandidate[] {
+  const { prefix, bigramKey, trigramKey, limit = DEFAULT_LIMIT } = request
+  const normalizedPrefix = prefix.toLowerCase()
+  const tokens = (request.sentenceTokens ?? []).map(normalizeGhostToken).filter(Boolean)
+  const last = tokens[tokens.length - 1] ?? bigramKey
+  const prev = tokens.length >= 2 ? tokens[tokens.length - 2] : trigramKey?.split(' ')[0]
+  const lastKey = last && last !== '^' ? last : null
+  const trigramFromSentence =
+    lastKey && prev ? `${prev} ${lastKey}` : trigramKey && trigramKey !== '^' ? trigramKey : null
+
+  const candidates = new Set<string>()
+  const sources = new Map<string, Set<PredictionSource>>()
+
+  const addCandidate = (word: string, source: PredictionSource) => {
+    const key = normalizeGhostToken(word)
+    if (!key || !matchesPrefix(key, normalizedPrefix)) return
+    candidates.add(key)
+    const set = sources.get(key) ?? new Set<PredictionSource>()
+    set.add(source)
+    sources.set(key, set)
+  }
+
+  for (const { word } of grammarContinuations(lastKey, trigramFromSentence)) {
+    addCandidate(word, 'grammar')
+  }
+
+  for (const word of topSuccessors(lastKey ? ngramData.bigrams[lastKey] : undefined, 20)) {
+    addCandidate(word, 'ngram')
+  }
+
+  for (const word of topSuccessors(
+    trigramFromSentence ? ngramData.trigrams[trigramFromSentence] : undefined,
+    16,
+  )) {
+    addCandidate(word, 'trigram')
+  }
+
+  tokens.forEach((token, index) => {
+    const take = index === tokens.length - 1 ? 8 : index === tokens.length - 2 ? 6 : 3
+    for (const word of topSuccessors(ngramData.bigrams[token], take)) {
+      addCandidate(word, 'ml')
+    }
+  })
+
+  if (tokens.length === 0) {
+    for (const word of SENTENCE_STARTERS) {
+      addCandidate(word, 'grammar')
+    }
+    for (const word of topSuccessors(ngramData.unigrams, 12)) {
+      addCandidate(word, 'ngram')
+    }
+  }
+
+  const weights = attentionWeights(tokens)
+  const ranked: PredictionCandidate[] = []
+
+  for (const word of candidates) {
+    let attended = 0
+    for (let i = 0; i < tokens.length; i++) {
+      attended += (weights[i] ?? 0) * condProb(ngramData.bigrams[tokens[i]!], word)
+    }
+
+    const tri = condProb(
+      trigramFromSentence ? ngramData.trigrams[trigramFromSentence] : undefined,
+      word,
+    )
+    const bi = condProb(lastKey ? ngramData.bigrams[lastKey] : undefined, word)
+    const grammar = grammarScoreFor(word, lastKey, trigramFromSentence)
+    const score =
+      attended * 140 +
+      tri * 95 +
+      bi * 42 +
+      grammar * 1.15 +
+      unigramProb(word) * 18 +
+      slotBonus(tokens, word) -
+      repeatPenalty(tokens, word)
+
+    ranked.push({
+      word: ghostDisplayWord(word, tokens),
+      score,
+      sources: [...(sources.get(word) ?? ['ml'])],
+    })
+  }
+
+  ranked.sort((a, b) => b.score - a.score || a.word.localeCompare(b.word))
+  return ranked.slice(0, limit)
+}
+
 function loadNgrams(data: NgramData) {
   ngramData = {
     bigrams: data.bigrams ?? {},
     trigrams: data.trigrams ?? {},
     unigrams: data.unigrams ?? {},
   }
+  unigramTotal = Object.values(ngramData.unigrams).reduce((sum, value) => sum + value, 0)
 
   const ready: PredictionReadyMessage = {
     type: 'ready',
@@ -395,7 +533,9 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   if (event.data.type !== 'predict') return
 
   const message = event.data
-  predict(message)
+  const run =
+    message.channel === 'ghost' ? Promise.resolve(predictGhost(message)) : predict(message)
+  run
     .then((candidates) => {
       const response: PredictionResponse = {
         id: message.id,

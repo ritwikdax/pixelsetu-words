@@ -9,6 +9,7 @@ export interface AnalyzedContext {
   mode: PredictionMode
   prefix: string
   previousWords: string[]
+  sentenceTokens: string[]
   bigramKey: string
   trigramKey: string | null
   fourgramKey: string | null
@@ -38,6 +39,25 @@ function extractTokens(text: string): string[] {
 export function extractPreviousWords(text: string, offset: number, count = 4): string[] {
   const tokens = extractTokens(text.slice(0, offset))
   return tokens.slice(-count)
+}
+
+/** Words in the current sentence before `offset` (same line, after . ! ?). */
+export function extractSentenceTokens(text: string, offset: number): string[] {
+  if (isAtEmptyLineStart(text, offset) || isAfterSentenceBoundary(text, offset)) {
+    return []
+  }
+
+  const line = getLineTextBeforeCursor(text, offset).replace(/\s+$/, '')
+  let start = 0
+  for (let i = line.length - 1; i >= 0; i--) {
+    const char = line[i]
+    if (char === '.' || char === '!' || char === '?') {
+      start = i + 1
+      break
+    }
+  }
+
+  return extractTokens(line.slice(start))
 }
 
 /** Completed words before the start of the word currently being typed. */
@@ -145,6 +165,7 @@ export function analyzeContext(state: EditorState): AnalyzedContext | null {
       mode: 'prefix',
       prefix: partial,
       previousWords: completedWords,
+      sentenceTokens: extractSentenceTokens(text, start),
       bigramKey,
       trigramKey,
       fourgramKey,
@@ -162,6 +183,7 @@ export function analyzeContext(state: EditorState): AnalyzedContext | null {
       mode: 'next-word',
       prefix: '',
       previousWords: completedWords,
+      sentenceTokens: extractSentenceTokens(text, offset),
       bigramKey,
       trigramKey,
       fourgramKey,
