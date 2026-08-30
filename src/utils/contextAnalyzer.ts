@@ -23,6 +23,7 @@ function getTextblockContext(state: EditorState) {
 
   const $pos = state.doc.resolve(from)
   if (!$pos.parent.isTextblock) return null
+  if ($pos.parent.type.name === 'codeBlock') return null
 
   return {
     from,
