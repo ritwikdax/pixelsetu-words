@@ -1,0 +1,17 @@
+---
+description: Dictionary, prediction, and agent Web Workers plus their React hooks.
+globs: src/workers/**/*.ts,src/hooks/useDictionaryWorker.ts,src/hooks/usePredictionWorker.ts,src/hooks/useAgentWorker.ts,src/hooks/useWordMemory.ts,src/utils/wordMemory.ts,src/utils/suggestionMerge.ts,src/utils/contextAnalyzer.ts
+alwaysApply: false
+---
+
+# Workers
+
+Vite workers: `import X from '../workers/….ts?worker'` then `new X()` (bundled file; avoids HTTP/1.1 pending on `?worker_file` ESM graphs). Typed `postMessage` unions live next to the worker.
+
+| Worker | Hook | Job |
+|--------|------|-----|
+| `dictionary.worker.ts` | `useDictionaryWorker` | Prefix search on ImageKit `dictionary.txt` (2-letter buckets) |
+| `prediction.worker.ts` | `usePredictionWorker` | Next-word / prefix from grammar rules, ImageKit ngrams, and personal graph |
+| `agent.worker.ts` | `useAgentWorker` | Gemini harness; abort; host-tool round trip |
+
+Fetch language assets on the main thread (`languageAssets.ts`), then `postMessage({ type: 'init' })` into the worker. Do not `fetch()` ImageKit from the worker (that hung the suggestion popover).

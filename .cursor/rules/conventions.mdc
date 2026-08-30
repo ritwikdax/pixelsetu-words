@@ -1,0 +1,16 @@
+---
+description: Coding conventions for Pixelsetu Word. Keep diffs small and match existing patterns.
+alwaysApply: true
+---
+
+# Conventions
+
+- TypeScript strict (`noUnusedLocals` / `noUnusedParameters`). Named exports. Functional components and hooks.
+- Colocate: UI in `components/`, TipTap in `extensions/`, workers in `workers/` with a matching `hooks/use*Worker.ts`.
+- Match neighbors: same imports, types, and error style. Copy `src/agents/calculator.ts` for a new agent; copy `src/extensions/curlBlock/` for a node with a React view.
+- Themes: add id to `src/data/themes.ts`, `[data-theme]` block in `src/index.css`, and the valid list in `index.html`. Never hardcode page colors in components.
+- Persistence: pages → `localStorage`; Gemini key → `keyStore` IndexedDB; learned words → `wordMemory` IndexedDB. Do not put secrets in source.
+- Dictionary weights: edit `scripts/word-weight-overrides.json` and `npm run sync:weights`. Do not hand-edit `words_dictionary.json`.
+- UI behavior/layout changes: verify the real flow in the browser (not a screenshot-only check). Check other pages/dialogs that share the state you touched.
+- Do not add markdown docs, tests, or commits unless asked. Do not expand `Editor.tsx` further if the logic belongs in `utils/` or `extensions/`.
+- Prefer reading `.cursor/rules` + the one file you will edit. Do not grep the whole `src/` tree first.

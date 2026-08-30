@@ -1,0 +1,32 @@
+---
+description: Pixelsetu Word product map, folders, and data flow. Use instead of exploring the repo.
+alwaysApply: true
+---
+
+# Pixelsetu Word
+
+Local-first notebook: TipTap editor, pages in `localStorage`, inline `@agent` runs via Gemini, autocomplete/prediction in Web Workers, a fake Unix terminal overlay.
+
+Stack: React 18, Vite 5, TypeScript strict, TipTap 2, no test runner, no router, no backend.
+
+## Layout (edit here, not elsewhere)
+
+- `src/App.tsx` — pages, theme, terminal/shortcuts/theme dialogs, persist via `utils/storage.ts`
+- `src/components/Editor.tsx` — TipTap instance, pickers, agent runs, suggestions (large; read only the section you need)
+- `src/extensions/` — TipTap nodes/marks (`curlBlock`, `agentMention`, `agentOutput`, `todo`, emoji, links)
+- `src/agents/` — `AgentDefinition`s + `registry.ts` (list: bro, weather, calculator, time)
+- `src/runtime/` — `harness.ts` (plan/tool loop), `gemini.ts` (`gemini-3.5-flash-lite`), `keyStore.ts` (IndexedDB AES-GCM)
+- `src/workers/` + `src/hooks/use*Worker.ts` — dictionary, prediction, agent (module workers)
+- `src/utils/` — storage, shortcuts, export, note block tools, terminal shell, word memory
+- `src/data/` — slash commands, themes, custom emoji GIFs
+- `src/index.css` — all theme CSS variables (`[data-theme='…']`)
+- `scripts/` + `data/dictionary/` — dictionary/ngram builds; `cli/gemini.mjs` — CLI key file
+- Pages: `DocumentPage` in `src/types.ts`. Key: `pixelsetu-word-pages`
+
+## Agent run path
+
+`@mention` in editor → `useAgentWorker` → `agent.worker` → `runAgentHarness` → Gemini JSON plan (`tool` | `reply`). Worker-side tools call `executeTool`. `host: true` tools round-trip to the editor (`noteBlocks.ts`: get/insert/replace/delete). Output is a locked `agentOutput` node. Bro also wraps calculator/weather/time/wiki/fetch plus host note tools.
+
+## Do not load unless asked
+
+`dist/`, `node_modules/`, `generated/`, huge JSON under `data/dictionary/`.

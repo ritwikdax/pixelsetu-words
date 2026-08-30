@@ -1,0 +1,16 @@
+---
+description: TipTap editor, custom nodes, slash commands, and in-editor pickers.
+globs: src/components/Editor.tsx,src/extensions/**/*.{ts,tsx},src/data/slashCommands.ts,src/components/{SlashCommandPicker,AgentPicker,EmojiPicker,WordSuggestions,InlineWordSuggestion,AnimatedCursor}.tsx
+alwaysApply: false
+---
+
+# Editor (TipTap)
+
+Single editor in `Editor.tsx`. StarterKit with `codeBlock: false`, `paragraph: false` (replaced by `ParagraphWithAgentOutput`). Register new extensions in the `useEditor({ extensions })` array.
+
+Custom nodes: `agentMention`, `agentOutput` + `agentOutputLock`, `curlBlock` (atom HTTP client), `todo`. Marks/helpers: `EmojiImage`, `EmojiReplacer`, `DocumentLink`, `ColorPreview`, `CodeBlockHighlight`, `EditorShortcuts`.
+
+- Slash `/`: `src/data/slashCommands.ts` + `SlashCommandPicker`. Agent `@`: `AgentPicker`. Emoji `:shortcode:`: `EmojiPicker` / `customEmojiGifs.ts`.
+- `agentOutput` is isolating, locked, not editable; keep the caret out of it (`agentOutputLock`, `ensureCursorInEditableParagraph`).
+- Node with UI: folder under `extensions/<name>/` with `index.ts` + `*View.tsx`, `ReactNodeViewRenderer`, `declare module '@tiptap/core'` for commands.
+- `Editor.tsx` is already large. Put new behavior in extensions or utils; wire the smallest possible hook in the editor.

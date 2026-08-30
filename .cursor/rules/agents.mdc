@@ -1,0 +1,15 @@
+---
+description: Inline Gemini agents, harness, host note tools, and registry.
+globs: src/agents/**/*.ts,src/runtime/**/*.ts,src/workers/agent.worker.ts,src/hooks/useAgentWorker.ts,src/utils/noteBlocks.ts,src/utils/agentMention.ts,src/utils/agentCapsule.ts
+alwaysApply: false
+---
+
+# Agents
+
+`AgentDefinition` (`src/agents/types.ts`): `id` (lowercase), `name`, `description`, `systemPrompt`, `tools[]`, `executeTool`. Register in `registry.ts` and re-export from `index.ts`.
+
+- Worker tools: implement in `executeTool`. Host tools: set `host: true`; harness calls `executeHostTool` (editor `noteBlocks.ts`). Do not implement host tools inside `executeTool`.
+- Bro (`bro.ts`) is the general agent: host note tools + wiki/fetch + reuses `safeEvaluate` / `fetchWeather` / `formatTime`. Keep specialized agents thin.
+- Gemini planning is JSON-only (`gemini.ts`). `MAX_ITERATIONS` is 10 in `harness.ts`.
+- Trigger: `@` → `AgentPicker` / `agentMention` node. Streaming writes `agentOutput` (locked). API key from `keyStore`; CLI twin is `cli/gemini.mjs`.
+- Adding an agent: follow `.cursor/skills/add-agent/SKILL.md`.

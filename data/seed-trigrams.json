@@ -1,0 +1,23 @@
+{
+  "the attached": ["file", "report", "spreadsheet", "image", "pdf", "copy", "draft", "summary", "list", "document"],
+  "the document": ["is", "has", "was", "contains", "includes", "provides", "describes", "outlines", "summarizes", "details"],
+  "the report": ["is", "has", "was", "contains", "includes", "provides", "describes", "outlines", "summarizes", "details"],
+  "please find": ["the", "attached", "below", "details", "information", "summary", "report", "document", "link", "copy"],
+  "please review": ["the", "attached", "document", "report", "draft", "proposal", "summary", "changes", "update", "feedback"],
+  "in the": ["document", "report", "attachment", "email", "section", "summary", "meantime", "future", "past", "end"],
+  "of the": ["document", "report", "project", "company", "team", "analysis", "study", "review", "process", "system"],
+  "to the": ["document", "report", "team", "manager", "client", "user", "system", "process", "meeting", "discussion"],
+  "for the": ["document", "report", "project", "team", "meeting", "review", "update", "analysis", "study", "process"],
+  "on the": ["document", "report", "page", "website", "platform", "system", "server", "call", "meeting", "date"],
+  "with the": ["document", "report", "team", "client", "manager", "system", "process", "data", "information", "details"],
+  "is a": ["document", "report", "summary", "list", "set", "group", "team", "project", "company", "model"],
+  "is the": ["document", "report", "summary", "list", "same", "main", "best", "first", "last", "latest"],
+  "this document": ["is", "has", "was", "contains", "includes", "provides", "describes", "outlines", "summarizes", "details"],
+  "this report": ["is", "has", "was", "contains", "includes", "provides", "describes", "outlines", "summarizes", "details"],
+  "we have": ["attached", "included", "provided", "shared", "reviewed", "updated", "completed", "received", "sent", "a"],
+  "you can": ["find", "see", "review", "use", "access", "download", "share", "contact", "check", "confirm"],
+  "i have": ["attached", "included", "provided", "shared", "reviewed", "updated", "completed", "sent", "a", "the"],
+  "will be": ["attached", "shared", "sent", "updated", "reviewed", "completed", "available", "ready", "a", "the"],
+  "can be": ["found", "used", "shared", "sent", "updated", "reviewed", "completed", "attached", "included", "accessed"],
+  "has been": ["attached", "shared", "sent", "updated", "reviewed", "completed", "approved", "published", "created", "modified"]
+}

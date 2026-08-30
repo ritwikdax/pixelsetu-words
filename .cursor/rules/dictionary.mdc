@@ -1,0 +1,17 @@
+---
+description: Word list, ngram builds, and weight overrides.
+globs: scripts/**,data/dictionary/**,data/seed-*.json,src/data/languageAssets.ts
+alwaysApply: false
+---
+
+# Dictionary and ngrams
+
+Sources (do not rewrite wholesale): `data/dictionary/words_dictionary.json`, `google-10000-english-no-swears.txt`, `data/seed-*.json`.
+
+Runtime URLs: `src/data/languageAssets.ts` (ImageKit). Do not put these files in `public/`.
+
+- Weight tweaks: `scripts/word-weight-overrides.json` then `npm run sync:weights`.
+- `npm run build:dictionary` → `generated/dictionary.txt` (upload to ImageKit)
+- `npm run build:ngrams` → `generated/prediction-ngrams.json` (upload to ImageKit)
+
+`dev` / `build` do not regenerate these. Details: `data/dictionary/README.md`. Skill: `.cursor/skills/dictionary-weights/SKILL.md`.

@@ -1,0 +1,14 @@
+---
+description: App shell, pages, shortcuts, themes, and the in-app terminal.
+globs: src/App.tsx,src/components/{DevTerminal,TerminalInputLine,StatusBar,ShortcutsDialog,ThemePickerDialog,PageTransition}.tsx,src/utils/{terminalShell,shortcuts,storage,export,pageOrientation}.ts,src/hooks/{useAppShortcuts,useTheme,useFocusTrap}.ts,src/data/themes.ts,src/index.css,index.html
+alwaysApply: false
+---
+
+# App shell
+
+`App.tsx` owns `pages[]`, `activePageId`, dialogs, and `savePages` on change. Orientation is per-page.
+
+- Global shortcuts: `utils/shortcuts.ts` + `useAppShortcuts` (capture phase; blocks many browser chords). Editor-only chords: `extensions/editorShortcuts.ts`.
+- Terminal: `DevTerminal` + `terminalShell.ts` (fake Unix over pages/theme/gemini/memory). Add commands there and to `HELP_LINES` / `KNOWN_COMMANDS`.
+- Themes: `themes.ts` + CSS `[data-theme]` + `index.html` boot script (avoids flash). Storage key `pixelsetu-theme`.
+- Export: `utils/export.ts` (markdown via Turndown, PDF via html2canvas/jspdf).
