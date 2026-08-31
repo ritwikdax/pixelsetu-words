@@ -4,6 +4,11 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { currentCalendarAttrs } from '../extensions/calendarBlock'
 import { EMPTY_CURL_ATTRS } from '../extensions/curlBlock'
 import { EMPTY_EXCALIDRAW_ATTRS } from '../extensions/excalidrawBlock'
+import {
+  createTimelineItem,
+  defaultTimelineItems,
+  parseTimelineItems,
+} from '../extensions/timelineBlock'
 import { isAgentOutputNode } from '../extensions/paragraphWithAgentOutput'
 import {
   fetchHttpResult,
@@ -36,7 +41,16 @@ export interface NoteBlockSpec {
   text?: string
   level?: number
   language?: string
-  items?: Array<string | { text?: string; checked?: boolean }>
+  items?: Array<
+    | string
+    | {
+        text?: string
+        checked?: boolean
+        time?: string
+        title?: string
+        subtext?: string
+      }
+  >
   method?: string
   url?: string
   headers?: string
@@ -264,6 +278,25 @@ function specToContent(spec: NoteBlockSpec): JSONContent {
           month: Number.isInteger(month) && month >= 1 && month <= 12 ? month : now.month,
           year: Number.isInteger(year) && year >= 1 && year <= 9999 ? year : now.year,
           configured: true,
+        },
+      }
+    }
+    case 'timeline':
+    case 'timelineblock': {
+      const items = (spec.items ?? []).map((item) => {
+        if (typeof item === 'string') {
+          return createTimelineItem({ title: item })
+        }
+        return createTimelineItem({
+          time: item.time,
+          title: item.title ?? item.text,
+          subtext: item.subtext,
+        })
+      })
+      return {
+        type: 'timelineBlock',
+        attrs: {
+          items: items.length > 0 ? parseTimelineItems(items) : defaultTimelineItems(),
         },
       }
     }
@@ -520,6 +553,17 @@ function describeBlock(block: IndexedBlock): string {
     const month = Number(node.attrs.month)
     const year = Number(node.attrs.year)
     return `[${id}] calendar${flag} | ${year}-${String(month).padStart(2, '0')}`
+  }
+  if (type === 'timelineBlock') {
+    const items = parseTimelineItems(node.attrs.items)
+    const preview = items
+      .slice(0, 3)
+      .map((item) => {
+        const label = [item.time, item.title].filter(Boolean).join(' ')
+        return label || '(empty)'
+      })
+      .join('; ')
+    return `[${id}] timeline${flag} | ${items.length} event${items.length === 1 ? '' : 's'}: ${preview}`
   }
   if (type === 'curlBlock') {
     const method = String(node.attrs.method ?? 'GET')

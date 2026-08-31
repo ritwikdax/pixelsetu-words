@@ -103,6 +103,15 @@ export const slashCommands: SlashCommand[] = [
     apply: (chain) => chain.insertCalendarBlock(),
   },
   {
+    id: 'timeline',
+    label: 'Timeline',
+    description: 'Vertical events with time, title, and subtext',
+    keywords: ['timeline', 'events', 'history', 'schedule', 'milestones'],
+    icon: '⋮',
+    category: 'blocks',
+    apply: (chain) => chain.insertTimelineBlock(),
+  },
+  {
     id: 'excalidraw',
     label: 'Drawing',
     description: 'Sketch or diagram on a canvas',

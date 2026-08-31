@@ -6,7 +6,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Editor as TiptapEditor } from '@tiptap/react'
 import type { DocumentPage } from '../types'
 import type { PageOrientation } from '../utils/pageOrientation'
-import { AnimatedCursor } from './AnimatedCursor'
 import { EmojiPicker } from './EmojiPicker'
 import { SlashCommandPicker } from './SlashCommandPicker'
 import { AgentPicker } from './AgentPicker'
@@ -22,6 +21,7 @@ import { DateTimePreview } from '../extensions/dateTimePreview'
 import { CodeBlockHighlight } from '../extensions/codeBlockHighlight'
 import { CalendarBlock } from '../extensions/calendarBlock'
 import { CurlBlock } from '../extensions/curlBlock'
+import { TimelineBlock } from '../extensions/timelineBlock'
 import { ExcalidrawBlock } from '../extensions/excalidrawBlock'
 import { HttpResult } from '../extensions/httpResult'
 import { AgentMention } from '../extensions/agentMention'
@@ -1018,6 +1018,7 @@ export function Editor({
       TodoTaskItem,
       CurlBlock,
       CalendarBlock,
+      TimelineBlock,
       ExcalidrawBlock,
       HttpResult,
       AgentMention,
@@ -1211,9 +1212,6 @@ export function Editor({
         data-orientation={orientation}
         ref={pageRef}
       >
-        {editor && (
-          <AnimatedCursor editor={editor} pageRef={pageRef} titleInputRef={titleInputRef} />
-        )}
         <header className="page-header">
           <input
             ref={titleInputRef}

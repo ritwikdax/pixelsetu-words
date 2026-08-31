@@ -1,6 +1,6 @@
 ---
 description: TipTap editor, custom nodes, slash commands, and in-editor pickers.
-globs: src/components/Editor.tsx,src/extensions/**/*.{ts,tsx},src/data/slashCommands.ts,src/components/{SlashCommandPicker,AgentPicker,EmojiPicker,WordSuggestions,InlineWordSuggestion,AnimatedCursor}.tsx
+globs: src/components/Editor.tsx,src/extensions/**/*.{ts,tsx},src/data/slashCommands.ts,src/components/{SlashCommandPicker,AgentPicker,EmojiPicker,WordSuggestions,InlineWordSuggestion}.tsx
 alwaysApply: false
 ---
 

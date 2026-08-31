@@ -4,6 +4,22 @@ export interface CaretRect {
   height: number
 }
 
+function applyTextTransform(text: string, transform: string): string {
+  if (transform === 'uppercase') return text.toUpperCase()
+  if (transform === 'lowercase') return text.toLowerCase()
+  if (transform === 'capitalize') {
+    return text.replace(/\S+/g, (word) => word.charAt(0).toUpperCase() + word.slice(1))
+  }
+  return text
+}
+
+export function isTimelineField(element: EventTarget | null): element is HTMLInputElement | HTMLTextAreaElement {
+  if (!(element instanceof HTMLInputElement) && !(element instanceof HTMLTextAreaElement)) {
+    return false
+  }
+  return Boolean(element.closest('.timeline-block'))
+}
+
 function getLineHeightPx(style: CSSStyleDeclaration): number {
   const fontSize = parseFloat(style.fontSize) || 16
   const lineHeight = style.lineHeight
@@ -46,7 +62,10 @@ export function getInputCaretRect(input: HTMLInputElement): CaretRect {
   ctx.font = font
 
   const letterSpacing = parseFloat(style.letterSpacing) || 0
-  const textBefore = input.value.slice(0, selectionStart)
+  const textBefore = applyTextTransform(
+    input.value.slice(0, selectionStart),
+    style.textTransform,
+  )
   let width = 0
   for (let index = 0; index < textBefore.length; index += 1) {
     width += ctx.measureText(textBefore[index]!).width + letterSpacing
