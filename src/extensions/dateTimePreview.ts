@@ -10,7 +10,7 @@ function buildDecorations(doc: ProseMirrorNode): DecorationSet {
   const decorations: Decoration[] = []
 
   doc.descendants((node, pos) => {
-    if (node.type.isCode) return false
+    if (node.type.name === 'codeBlock') return false
     if (!node.isText || !node.text) return
     if (node.marks.some((mark) => mark.type.name === 'code')) return
 
