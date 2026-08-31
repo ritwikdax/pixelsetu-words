@@ -94,6 +94,15 @@ export const slashCommands: SlashCommand[] = [
     apply: (chain) => chain.insertCurlBlock(),
   },
   {
+    id: 'calendar',
+    label: 'Calendar',
+    description: 'Month view with today highlighted',
+    keywords: ['calendar', 'calender', 'month', 'date', 'dates'],
+    icon: '▦',
+    category: 'blocks',
+    apply: (chain) => chain.insertCalendarBlock(),
+  },
+  {
     id: 'divider',
     label: 'Divider',
     description: 'Visual separator',

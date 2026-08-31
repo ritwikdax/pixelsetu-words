@@ -18,8 +18,11 @@ import { useAgentWorker } from '../hooks/useAgentWorker'
 import { useWordMemory } from '../hooks/useWordMemory'
 import { EditorShortcuts } from '../extensions/editorShortcuts'
 import { ColorPreview } from '../extensions/colorPreview'
+import { DateTimePreview } from '../extensions/dateTimePreview'
 import { CodeBlockHighlight } from '../extensions/codeBlockHighlight'
+import { CalendarBlock } from '../extensions/calendarBlock'
 import { CurlBlock } from '../extensions/curlBlock'
+import { HttpResult } from '../extensions/httpResult'
 import { AgentMention } from '../extensions/agentMention'
 import { AgentOutput } from '../extensions/agentOutput'
 import { AgentOutputLock } from '../extensions/agentOutputLock'
@@ -37,7 +40,7 @@ import {
 } from '../utils/wordAtCursor'
 import { mergePredictionResults, type RankedSuggestion } from '../utils/suggestionMerge'
 import { formatPageCreatedAt } from '../utils/formatPageDate'
-import { isAtDocumentStart } from '../utils/editorSelection'
+import { focusAtDocumentEnd, isAtDocumentStart } from '../utils/editorSelection'
 import { getSurfaceCaretCoords } from '../utils/caretCoords'
 import { getSuggestionUi, buildSuggestionInsertion } from '../utils/applySuggestionCasing'
 import {
@@ -190,6 +193,8 @@ function getCaretCoords(
 ) {
   return getSurfaceCaretCoords(editor, surface, placement)
 }
+
+let skipInitialEndFocus = true
 
 export function Editor({
   page,
@@ -1007,9 +1012,12 @@ export function Editor({
       EmojiImage,
       EmojiReplacer,
       ColorPreview,
+      DateTimePreview,
       TodoTaskList,
       TodoTaskItem,
       CurlBlock,
+      CalendarBlock,
+      HttpResult,
       AgentMention,
       AgentOutput,
       AgentOutputLock,
@@ -1160,6 +1168,19 @@ export function Editor({
     if (current !== page.content) {
       editor.commands.setContent(page.content, false)
     }
+  }, [page.id, editor])
+
+  useEffect(() => {
+    if (!editor) return
+    if (skipInitialEndFocus) {
+      skipInitialEndFocus = false
+      return
+    }
+    const frame = requestAnimationFrame(() => {
+      focusAtDocumentEnd(editor)
+      ensureCursorInEditableParagraph(editor)
+    })
+    return () => cancelAnimationFrame(frame)
   }, [page.id, editor])
 
   useEffect(() => {

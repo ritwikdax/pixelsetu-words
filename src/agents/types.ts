@@ -3,6 +3,7 @@ export interface AgentTool {
   description: string
   parameters: Record<string, { type: string; description: string; required?: boolean }>
   host?: boolean
+  once?: boolean
 }
 
 export interface AgentRunContext {

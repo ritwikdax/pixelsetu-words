@@ -7,7 +7,7 @@ export const WELCOME_PAGE_HTML = `
 <p>Keep typing. A faint ghost word appears after you finish a word — press <strong>Tab</strong> to take it. After two letters, a popover lists completions; use arrows and Enter.</p>
 
 <h2>Slash commands</h2>
-<p>On an empty line, type <code>/</code> for headings, lists, quotes, code, to-dos, dividers, and API blocks. Type <code>/h1</code> or <code>/curl</code> to filter.</p>
+<p>On an empty line, type <code>/</code> for headings, lists, quotes, code, to-dos, dividers, calendars, and API blocks. Type <code>/h1</code>, <code>/calendar</code>, or <code>/curl</code> to filter.</p>
 
 <h1>Heading 1</h1>
 <h2>Heading 2</h2>
@@ -50,7 +50,15 @@ export const WELCOME_PAGE_HTML = `
 <p>Type <code>@</code> to mention an agent, then a prompt, then Space or Enter to run. Bro is the general one; weather, calculator, and time are specialists. A Gemini API key is stored locally — set it in the terminal with <code>gemini --set-key</code>.</p>
 <p>Mentions look like this: <span data-agent-mention="" data-agent-id="bro" data-active="false"></span> <span data-agent-mention="" data-agent-id="weather" data-active="false"></span> <span data-agent-mention="" data-agent-id="calculator" data-active="false"></span> <span data-agent-mention="" data-agent-id="time" data-active="false"></span></p>
 <p>After a run, the answer lands in a locked block. Hover to delete, double-click to edit.</p>
-<div class="agent-output" data-agent-output-block="" data-agent-output="true" data-agent-running="false" data-agent-locked="true" data-agent-thoughts="Picked a short welcome.&#10;No tools needed.">Hi — I am Bro. Ask me to calculate, look up weather, fetch a page, or edit this note.</div>
+<div class="agent-output" data-agent-output-block="" data-agent-output="true" data-agent-running="false" data-agent-locked="true" data-agent-thoughts="Picked a short welcome.&#10;No tools needed.">Hi — I am Bro. Ask me to calculate, look up weather, fetch a URL, or edit this note.</div>
+<p>Ask Bro to GET a link — <code>@bro</code> get https://jsonplaceholder.typicode.com/todos/1 — and the JSON lands as a card or table, not a raw dump.</p>
+<div data-http-result="" data-content-type="application/json" data-body="{&quot;userId&quot;:1,&quot;id&quot;:1,&quot;title&quot;:&quot;Buy milk&quot;,&quot;completed&quot;:false}"></div>
+<div data-http-result="" data-content-type="application/json" data-body="[{&quot;id&quot;:1,&quot;name&quot;:&quot;Ada Lovelace&quot;,&quot;role&quot;:&quot;Engineer&quot;},{&quot;id&quot;:2,&quot;name&quot;:&quot;Grace Hopper&quot;,&quot;role&quot;:&quot;Scientist&quot;}]"></div>
+<p></p>
+
+<h2>Calendar</h2>
+<p>Insert <code>/calendar</code>. The current month is selected — press Enter to drop it in. Only month and year change; the dates stay read-only. Today is marked when you are looking at this month.</p>
+<div data-calendar-block="" data-month="8" data-year="2026" data-configured="true"></div>
 <p></p>
 
 <h2>API request</h2>
@@ -60,7 +68,7 @@ export const WELCOME_PAGE_HTML = `
 
 <h2>Pages, theme, terminal</h2>
 <ul>
-  <li><p><strong>Pages</strong> — <code>Ctrl + Alt + N</code> new, <code>Ctrl + Alt + W</code> close, <code>Ctrl + Alt + T</code> rename. <code>Ctrl + I</code> cycles portrait, landscape, fullscreen. <code>Ctrl + Shift + ← / →</code> moves between pages.</p></li>
+  <li><p><strong>Pages</strong> — <code>Ctrl + Alt + N</code> new, <code>Ctrl + Alt + W</code> close, <code>Ctrl + Alt + T</code> rename. <code>Ctrl + I</code> cycles portrait, landscape, fullscreen. <code>Ctrl + Alt + [ / ]</code> moves between pages.</p></li>
   <li><p><strong>Theme</strong> — <code>Ctrl + K</code> then <code>Ctrl + T</code>, or <code>theme ocean</code> in the terminal.</p></li>
   <li><p><strong>Terminal</strong> — <code>Ctrl + \`</code>. Try <code>help</code>, <code>ls</code>, <code>export md</code>, <code>neofetch</code>.</p></li>
   <li><p><strong>Shortcuts</strong> — <code>Ctrl + K</code> then <code>Ctrl + S</code>.</p></li>

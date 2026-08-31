@@ -50,6 +50,7 @@ function buildPlanningPrompt(
     'Respond with ONLY valid JSON (no markdown fences). Use one of:',
     '{"action":"tool","tool":"<name>","params":{...},"reasoning":"..."}',
     '{"action":"reply","text":"<final answer>"}',
+    'Do not call a tool again after it succeeded. Prefer reply once you have a result.',
     '',
     `User request: ${userPrompt}${note}${history}`,
   ].join('\n')

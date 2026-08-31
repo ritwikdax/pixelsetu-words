@@ -80,6 +80,13 @@ function isPageJumpShortcut(e: KeyboardEvent): boolean {
   return /^[1-9]$/.test(e.key)
 }
 
+/** ⌘⌥[ / ⌘⌥] — not used by Chrome/Safari for tabs (those steal ⌘⌥←/→). */
+function isPageBracketShortcut(e: KeyboardEvent, side: 'left' | 'right'): boolean {
+  if (!isMod(e) || !e.altKey || e.shiftKey) return false
+  if (side === 'left') return e.code === 'BracketLeft' || e.key === '['
+  return e.code === 'BracketRight' || e.key === ']'
+}
+
 export function cancelPageJump() {
   resetPageJump()
 }
@@ -106,15 +113,13 @@ export function matchesAppShortcut(e: KeyboardEvent): boolean {
   if (mod && e.key.toLowerCase() === 'n' && !e.shiftKey) return true
   if (mod && e.key.toLowerCase() === 'w' && !e.shiftKey) return true
   if (mod && e.altKey && e.key.toLowerCase() === 't') return true
-  if (mod && e.shiftKey && e.key === 'ArrowRight') return true
-  if (mod && e.shiftKey && e.key === 'ArrowLeft') return true
+  if (isPageBracketShortcut(e, 'right')) return true
+  if (isPageBracketShortcut(e, 'left')) return true
   if (mod && e.key === 'PageDown') return true
   if (mod && e.key === 'PageUp') return true
   if (mod && e.key === 'Tab') return true
   if (mod && e.altKey && e.key === 'ArrowDown') return true
   if (mod && e.altKey && e.key === 'ArrowUp') return true
-  if (e.altKey && e.key === 'ArrowRight') return true
-  if (e.altKey && e.key === 'ArrowLeft') return true
   if (isPageJumpShortcut(e)) return true
 
   return false
@@ -205,13 +210,13 @@ export function handleAppShortcut(e: KeyboardEvent, actions: ShortcutActions): b
     return true
   }
 
-  if (mod && e.shiftKey && e.key === 'ArrowRight') {
+  if (isPageBracketShortcut(e, 'right')) {
     e.preventDefault()
     actions.goToNextPage()
     return true
   }
 
-  if (mod && e.shiftKey && e.key === 'ArrowLeft') {
+  if (isPageBracketShortcut(e, 'left')) {
     e.preventDefault()
     actions.goToPrevPage()
     return true
@@ -243,18 +248,6 @@ export function handleAppShortcut(e: KeyboardEvent, actions: ShortcutActions): b
   }
 
   if (mod && e.altKey && e.key === 'ArrowUp') {
-    e.preventDefault()
-    actions.goToPrevPage()
-    return true
-  }
-
-  if (e.altKey && e.key === 'ArrowRight') {
-    e.preventDefault()
-    actions.goToNextPage()
-    return true
-  }
-
-  if (e.altKey && e.key === 'ArrowLeft') {
     e.preventDefault()
     actions.goToPrevPage()
     return true
@@ -301,12 +294,11 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { keys: 'Ctrl + Alt + W', action: 'Close current page' },
       { keys: 'Ctrl + Alt + T', action: 'Edit page title' },
       { keys: 'Ctrl + I', action: 'Cycle page orientation (portrait → landscape → fullscreen)' },
-      { keys: 'Ctrl + Shift + ← / →', action: 'Previous / next page (animated)' },
+      { keys: 'Ctrl + Alt + [ / ]', action: 'Previous / next page (animated)' },
       { keys: 'Ctrl + Tab', action: 'Next page' },
       { keys: 'Ctrl + Shift + Tab', action: 'Previous page' },
       { keys: 'Ctrl + PageDown', action: 'Next page' },
       { keys: 'Ctrl + PageUp', action: 'Previous page' },
-      { keys: 'Alt + ← / →', action: 'Previous / next page' },
       { keys: 'Ctrl + Alt + ↑ / ↓', action: 'Previous / next page' },
       { keys: 'Ctrl + 1–9', action: 'Jump to page (chain digits, e.g. Ctrl+1 then Ctrl+3 → page 13)' },
     ],
@@ -329,7 +321,7 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { keys: 'Ctrl + Enter', action: 'Line break' },
       { keys: '::', action: 'Open emoji & reaction picker (type ::smile to filter)' },
       { keys: ':name: or :name + Space', action: 'Insert emoji or animated GIF (e.g. :smile:, :partyparrot:)' },
-      { keys: '/', action: 'Open block command menu (type /heading, /quote, /curl, etc.)' },
+      { keys: '/', action: 'Open block command menu (type /heading, /quote, /curl, /calendar, etc.)' },
       { keys: 'Tab', action: 'Insert 4 spaces (accepts inline suggestion or popover when open)' },
       { keys: '↑ / ↓', action: 'Navigate popover suggestions (2+ letters)' },
       { keys: 'Enter', action: 'Accept popover suggestion' },

@@ -75,36 +75,6 @@ async function searchWikipedia(query: string): Promise<string> {
   )
 }
 
-async function fetchUrl(url: string): Promise<string> {
-  const trimmed = url.trim()
-  if (!/^https?:\/\//i.test(trimmed)) {
-    throw new Error('url must start with http:// or https://')
-  }
-
-  const readerUrl = `https://r.jina.ai/${trimmed}`
-  const response = await fetch(readerUrl, {
-    headers: { Accept: 'text/plain' },
-  })
-
-  if (response.ok) {
-    const text = await response.text()
-    if (text.trim()) return truncate(text)
-  }
-
-  const fallback = await fetch(trimmed)
-  if (!fallback.ok) {
-    throw new Error(`Failed to fetch URL (${response.status || fallback.status})`)
-  }
-
-  const contentType = fallback.headers.get('content-type') ?? ''
-  const body = await fallback.text()
-  const text = contentType.includes('html') ? stripHtml(body) : body
-  if (!text) {
-    throw new Error('Fetched page had no readable text')
-  }
-  return truncate(text)
-}
-
 export const broAgent: AgentDefinition = {
   id: 'bro',
   name: 'Bro',
@@ -114,11 +84,14 @@ export const broAgent: AgentDefinition = {
     'You can see the full current page. The user may ask you to read, rewrite, or extend what is already written. ' +
     'When they want the note changed, use note tools instead of only describing the edit. ' +
     'Never create, edit, or delete agent blocks (agentInvocation / agentOutput / @mentions). Those are read-only. ' +
-    'Supported note blocks: paragraph, heading (level 1-3), quote, codeBlock, bulletList, numberedList, todoList, divider, curl (API request), image. ' +
+    'Supported note blocks: paragraph, heading (level 1-3), quote, codeBlock, bulletList, numberedList, todoList, divider, calendar (month, year), curl (API request), image. ' +
     'Inline markdown is allowed in text: **bold**, *italic*, ~~strike~~, `code`, [label](url). ' +
-    'Prefer insertBlocks with a markdown string for longer writing. Use structured blocks for curl, todos with checkboxes, and images. ' +
+    'Prefer insertBlocks with a markdown string for longer writing. Use structured blocks for calendar, curl, todos with checkboxes, and images. ' +
     'Always use block ids from the latest snapshot (b1, b2, …). After a note tool, ids may change. ' +
     'Use searchWikipedia, fetchUrl, getWeather, getTime, or calculate when you need live or external data. ' +
+    'When the user asks to get, open, read, or fetch a URL, link, or API, call fetchUrl exactly once, then reply. ' +
+    'Never call fetchUrl more than once for the same request. ' +
+    'fetchUrl inserts a readable card or table on the page. Reply with a short confirmation only — no JSON, URLs, or HTTP status. ' +
     'For questions that only need the existing note, do not call external tools. ' +
     'Be concise. If you already edited the note, the final reply should be a short confirmation.',
   tools: [
@@ -147,7 +120,7 @@ export const broAgent: AgentDefinition = {
         blocks: {
           type: 'array',
           description:
-            'Structured blocks: {type, text?, level?, language?, items?, method?, url?, headers?, body?, src?, alt?}',
+            'Structured blocks: {type, text?, level?, language?, items?, method?, url?, headers?, body?, src?, alt?, month?, year?}',
         },
       },
     },
@@ -191,9 +164,12 @@ export const broAgent: AgentDefinition = {
     },
     {
       name: 'fetchUrl',
-      description: 'Fetch and read the text content of a public web page',
+      description:
+        'GET a public URL once and insert a readable card or table. Call at most once, then reply.',
+      host: true,
+      once: true,
       parameters: {
-        url: { type: 'string', description: 'Full http(s) URL to read', required: true },
+        url: { type: 'string', description: 'Full http(s) URL to GET', required: true },
       },
     },
     {
@@ -228,11 +204,6 @@ export const broAgent: AgentDefinition = {
         const query = String(params.query ?? '').trim()
         if (!query) throw new Error('query parameter is required')
         return searchWikipedia(query)
-      }
-      case 'fetchUrl': {
-        const url = String(params.url ?? '').trim()
-        if (!url) throw new Error('url parameter is required')
-        return fetchUrl(url)
       }
       case 'getWeather': {
         const city = String(params.city ?? '').trim()

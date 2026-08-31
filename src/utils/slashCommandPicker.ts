@@ -5,6 +5,7 @@ import {
   type SlashCommand,
   type SlashCommandCategory,
 } from '../data/slashCommands'
+import { focusCalendarSetupSelect } from './focusCalendarSetup'
 import { focusCurlSetupInput } from './focusCurlSetup'
 
 export const SLASH_COMMAND_TRIGGER = /(?:^|\s)\/([a-z0-9-]*)$/i
@@ -116,6 +117,14 @@ export function insertSlashCommand(
     const inserted = editor.chain().deleteRange({ from, to }).insertCurlBlock().run()
     if (inserted) {
       queueMicrotask(() => focusCurlSetupInput(editor))
+    }
+    return
+  }
+
+  if (command.id === 'calendar') {
+    const inserted = editor.chain().deleteRange({ from, to }).insertCalendarBlock().run()
+    if (inserted) {
+      queueMicrotask(() => focusCalendarSetupSelect(editor))
     }
     return
   }

@@ -1,8 +1,14 @@
 import type { Editor } from '@tiptap/core'
 import type { JSONContent } from '@tiptap/core'
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
+import { currentCalendarAttrs } from '../extensions/calendarBlock'
 import { EMPTY_CURL_ATTRS } from '../extensions/curlBlock'
 import { isAgentOutputNode } from '../extensions/paragraphWithAgentOutput'
+import {
+  fetchHttpResult,
+  parseHttpResultBody,
+  summarizeHttpResult,
+} from './httpResult'
 import { normalizeUrl } from './url'
 
 const SNAPSHOT_MAX = 24000
@@ -15,6 +21,7 @@ export const NOTE_TOOL_NAMES = [
   'replaceBlock',
   'replaceBlocks',
   'deleteBlocks',
+  'fetchUrl',
 ] as const
 
 export type NoteToolName = (typeof NOTE_TOOL_NAMES)[number]
@@ -36,6 +43,8 @@ export interface NoteBlockSpec {
   src?: string
   alt?: string
   checked?: boolean
+  month?: number
+  year?: number
 }
 
 interface IndexedBlock {
@@ -243,6 +252,20 @@ function specToContent(spec: NoteBlockSpec): JSONContent {
     case 'hr':
     case 'horizontalrule':
       return { type: 'horizontalRule' }
+    case 'calendar':
+    case 'calendarblock': {
+      const now = currentCalendarAttrs(true)
+      const month = Number(spec.month ?? now.month)
+      const year = Number(spec.year ?? now.year)
+      return {
+        type: 'calendarBlock',
+        attrs: {
+          month: Number.isInteger(month) && month >= 1 && month <= 12 ? month : now.month,
+          year: Number.isInteger(year) && year >= 1 && year <= 9999 ? year : now.year,
+          configured: true,
+        },
+      }
+    }
     case 'curl':
     case 'curlblock':
     case 'apirequest': {
@@ -270,7 +293,7 @@ function specToContent(spec: NoteBlockSpec): JSONContent {
     }
     default:
       throw new Error(
-        `Unsupported block type "${spec.type}". Use paragraph, heading, blockquote, codeBlock, bulletList, numberedList, todoList, divider, curl, or image.`,
+        `Unsupported block type "${spec.type}". Use paragraph, heading, blockquote, codeBlock, bulletList, numberedList, todoList, divider, calendar, curl, or image.`,
       )
   }
 }
@@ -483,10 +506,18 @@ function describeBlock(block: IndexedBlock): string {
   if (type === 'horizontalRule') {
     return `[${id}] divider${flag}`
   }
+  if (type === 'calendarBlock') {
+    const month = Number(node.attrs.month)
+    const year = Number(node.attrs.year)
+    return `[${id}] calendar${flag} | ${year}-${String(month).padStart(2, '0')}`
+  }
   if (type === 'curlBlock') {
     const method = String(node.attrs.method ?? 'GET')
     const url = String(node.attrs.url ?? '')
     return `[${id}] curl${flag} | ${method} ${url || '(not configured)'}`
+  }
+  if (type === 'httpResult') {
+    return `[${id}] fetched data${flag}`
   }
   if (type === 'agentOutput' || isAgentOutputNode(node)) {
     return `[${id}] agentOutput${flag} | ${node.textContent}`
@@ -561,18 +592,81 @@ function snapshotResult(editor: Editor, message: string, title?: string): string
   return `${message}\n\nUpdated note:\n${serializeNotePage(editor, title)}`
 }
 
-export function executeNoteTool(
+function insertPosAfterRunningAgentOutput(editor: Editor): number {
+  let insertPos: number | null = null
+  editor.state.doc.descendants((node, pos) => {
+    if (insertPos !== null) return false
+    if (node.type.name === 'agentOutput' && node.attrs.agentOutputRunning) {
+      insertPos = pos + node.nodeSize
+      return false
+    }
+    return undefined
+  })
+  return insertPos ?? editor.state.doc.content.size
+}
+
+function hasHttpResultForUrl(editor: Editor, url: string): boolean {
+  let found = false
+  editor.state.doc.descendants((node) => {
+    if (found) return false
+    if (node.type.name === 'httpResult' && String(node.attrs.url ?? '') === url) {
+      found = true
+      return false
+    }
+    return undefined
+  })
+  return found
+}
+
+async function executeFetchUrl(
+  editor: Editor,
+  params: Record<string, unknown>,
+): Promise<string> {
+  const url = String(params.url ?? '').trim()
+  if (!url) throw new Error('url parameter is required')
+
+  if (hasHttpResultForUrl(editor, url)) {
+    return 'The readable card is already on the page. Reply with a short confirmation. Do not call fetchUrl again.'
+  }
+
+  const payload = await fetchHttpResult(url)
+  const parsed = parseHttpResultBody(payload.body, payload.contentType)
+
+  if (!hasHttpResultForUrl(editor, url)) {
+    const content: JSONContent[] = [
+      {
+        type: 'httpResult',
+        attrs: {
+          url: payload.url,
+          contentType: payload.contentType,
+          body: payload.body,
+        },
+      },
+    ]
+    const pos = insertPosAfterRunningAgentOutput(editor)
+    const ok = insertAt(editor, pos, content)
+    if (!ok) throw new Error('Failed to insert fetch result')
+  }
+
+  return summarizeHttpResult(parsed)
+}
+
+export async function executeNoteTool(
   editor: Editor,
   name: string,
   params: Record<string, unknown>,
   title?: string,
-): string {
+): Promise<string> {
   if (!isNoteToolName(name)) {
     throw new Error(`Unknown note tool: ${name}`)
   }
 
   if (name === 'getNote') {
     return serializeNotePage(editor, title)
+  }
+
+  if (name === 'fetchUrl') {
+    return executeFetchUrl(editor, params)
   }
 
   const blocks = listTopLevelBlocks(editor.state.doc)

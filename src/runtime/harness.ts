@@ -99,6 +99,7 @@ export async function runAgentHarness(
         }
         toolResults.push(`${toolName}: ${result}`)
         callbacks.onStatus?.(`Got ${toolName} result`)
+        if (knownTool.once) break
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Tool execution failed'
         toolResults.push(`${toolName} error: ${message}`)
