@@ -29,7 +29,7 @@ export const HELP_LINES = [
   '  cat [name]          — print a page as markdown',
   '  touch [name]        — create a note',
   '  nano [name]         — create if needed, then open in the editor',
-  '  rm <name|id>        — delete a page',
+  '  rm [name|id|.]      — delete a page (current note if omitted; refuses the last one)',
   '  mv <old> <new>      — rename a page',
   '  wc [name]           — word / line / character count',
   '  export md | pdf     — export the current page',
@@ -44,7 +44,7 @@ export const HELP_LINES = [
   '  cowsay [text]       — a cow, obviously',
   '',
   'app',
-  '  theme <name|next>   — light, dark, sepia, nord, forest, rose, midnight, ocean, ember, matcha, dracula',
+  '  theme <name|next>   — switch color theme (run theme to list names)',
   '  shortcuts           — keyboard shortcuts',
   '  memory stats|clear  — learned word patterns',
   '  gemini --set-key | --status | --clear',
@@ -489,13 +489,10 @@ export async function runShellCommand(
 
     case 'rm': {
       const query = args.join(' ')
-      if (!query) {
-        io.print('error', 'usage: rm <name|id>')
-        break
-      }
-      const page = ctx.findPage(query)
+      const page =
+        !query || query === '.' ? ctx.activePage : ctx.findPage(query)
       if (!page) {
-        io.print('error', `rm: no such note: ${query}`)
+        io.print('error', query ? `rm: no such note: ${query}` : 'rm: no current note')
       } else if (ctx.pages.length <= 1) {
         io.print('error', 'rm: cannot delete the last page')
       } else {

@@ -87,6 +87,12 @@ function isPageBracketShortcut(e: KeyboardEvent, side: 'left' | 'right'): boolea
   return e.code === 'BracketRight' || e.key === ']'
 }
 
+/** ⌘⌥W / Ctrl+Alt+W — match `code` so Option+W on macOS still hits (key becomes ∑). */
+function isClosePageShortcut(e: KeyboardEvent): boolean {
+  if (!isMod(e) || !e.altKey || e.shiftKey) return false
+  return e.code === 'KeyW' || e.key.toLowerCase() === 'w'
+}
+
 export function cancelPageJump() {
   resetPageJump()
 }
@@ -111,7 +117,7 @@ export function matchesAppShortcut(e: KeyboardEvent): boolean {
   if (mod && e.key.toLowerCase() === 's' && !e.shiftKey && !e.altKey) return true
   if (mod && e.key.toLowerCase() === 'i' && !e.shiftKey && !e.altKey) return true
   if (mod && e.key.toLowerCase() === 'n' && !e.shiftKey) return true
-  if (mod && e.key.toLowerCase() === 'w' && !e.shiftKey) return true
+  if (isClosePageShortcut(e)) return true
   if (mod && e.altKey && e.key.toLowerCase() === 't') return true
   if (isPageBracketShortcut(e, 'right')) return true
   if (isPageBracketShortcut(e, 'left')) return true
@@ -198,7 +204,7 @@ export function handleAppShortcut(e: KeyboardEvent, actions: ShortcutActions): b
     return true
   }
 
-  if (mod && e.key.toLowerCase() === 'w' && !e.shiftKey) {
+  if (isClosePageShortcut(e)) {
     e.preventDefault()
     actions.closePage()
     return true
@@ -291,7 +297,7 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
     title: 'Pages',
     shortcuts: [
       { keys: 'Ctrl + Alt + N', action: 'New page' },
-      { keys: 'Ctrl + Alt + W', action: 'Close current page' },
+      { keys: 'Ctrl + Alt + W', action: 'Delete current page (kept if it is the last one)' },
       { keys: 'Ctrl + Alt + T', action: 'Edit page title' },
       { keys: 'Ctrl + I', action: 'Cycle page orientation (portrait → landscape → fullscreen)' },
       { keys: 'Ctrl + Alt + [ / ]', action: 'Previous / next page (animated)' },

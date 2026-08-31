@@ -53,9 +53,11 @@ function App() {
   const deletePage = useCallback((pageId: string) => {
     setPages((prev) => {
       if (prev.length <= 1) return prev
+      const idx = prev.findIndex((p) => p.id === pageId)
+      if (idx < 0) return prev
       const next = prev.filter((p) => p.id !== pageId)
       if (pageId === activePageIdRef.current) {
-        setActivePageId(next[0].id)
+        setActivePageId(next[Math.min(idx, next.length - 1)].id)
       }
       return next
     })
