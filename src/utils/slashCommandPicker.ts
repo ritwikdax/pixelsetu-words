@@ -7,6 +7,7 @@ import {
 } from '../data/slashCommands'
 import { focusCalendarSetupSelect } from './focusCalendarSetup'
 import { focusCurlSetupInput } from './focusCurlSetup'
+import { openLatestExcalidrawEditor } from './focusExcalidrawSetup'
 
 export const SLASH_COMMAND_TRIGGER = /(?:^|\s)\/([a-z0-9-]*)$/i
 
@@ -125,6 +126,14 @@ export function insertSlashCommand(
     const inserted = editor.chain().deleteRange({ from, to }).insertCalendarBlock().run()
     if (inserted) {
       queueMicrotask(() => focusCalendarSetupSelect(editor))
+    }
+    return
+  }
+
+  if (command.id === 'excalidraw') {
+    const inserted = editor.chain().deleteRange({ from, to }).insertExcalidrawBlock().run()
+    if (inserted) {
+      queueMicrotask(() => openLatestExcalidrawEditor(editor))
     }
     return
   }

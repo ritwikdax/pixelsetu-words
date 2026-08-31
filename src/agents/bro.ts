@@ -84,7 +84,7 @@ export const broAgent: AgentDefinition = {
     'You can see the full current page. The user may ask you to read, rewrite, or extend what is already written. ' +
     'When they want the note changed, use note tools instead of only describing the edit. ' +
     'Never create, edit, or delete agent blocks (agentInvocation / agentOutput / @mentions). Those are read-only. ' +
-    'Supported note blocks: paragraph, heading (level 1-3), quote, codeBlock, bulletList, numberedList, todoList, divider, calendar (month, year), curl (API request), image. ' +
+    'Supported note blocks: paragraph, heading (level 1-3), quote, codeBlock, bulletList, numberedList, todoList, divider, calendar (month, year), curl (API request), drawing (excalidraw), image. ' +
     'Inline markdown is allowed in text: **bold**, *italic*, ~~strike~~, `code`, [label](url). ' +
     'Prefer insertBlocks with a markdown string for longer writing. Use structured blocks for calendar, curl, todos with checkboxes, and images. ' +
     'Always use block ids from the latest snapshot (b1, b2, …). After a note tool, ids may change. ' +
@@ -120,7 +120,7 @@ export const broAgent: AgentDefinition = {
         blocks: {
           type: 'array',
           description:
-            'Structured blocks: {type, text?, level?, language?, items?, method?, url?, headers?, body?, src?, alt?, month?, year?}',
+            'Structured blocks: {type, text?, level?, language?, items?, method?, url?, headers?, body?, src?, alt?, month?, year?} (type drawing/excalidraw inserts an empty canvas)',
         },
       },
     },

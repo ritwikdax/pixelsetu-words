@@ -103,6 +103,15 @@ export const slashCommands: SlashCommand[] = [
     apply: (chain) => chain.insertCalendarBlock(),
   },
   {
+    id: 'excalidraw',
+    label: 'Drawing',
+    description: 'Sketch or diagram on a canvas',
+    keywords: ['draw', 'diagram', 'excalidraw', 'sketch', 'whiteboard', 'canvas'],
+    icon: '✎',
+    category: 'tools',
+    apply: (chain) => chain.insertExcalidrawBlock(),
+  },
+  {
     id: 'divider',
     label: 'Divider',
     description: 'Visual separator',

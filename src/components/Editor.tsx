@@ -22,6 +22,7 @@ import { DateTimePreview } from '../extensions/dateTimePreview'
 import { CodeBlockHighlight } from '../extensions/codeBlockHighlight'
 import { CalendarBlock } from '../extensions/calendarBlock'
 import { CurlBlock } from '../extensions/curlBlock'
+import { ExcalidrawBlock } from '../extensions/excalidrawBlock'
 import { HttpResult } from '../extensions/httpResult'
 import { AgentMention } from '../extensions/agentMention'
 import { AgentOutput } from '../extensions/agentOutput'
@@ -1017,6 +1018,7 @@ export function Editor({
       TodoTaskItem,
       CurlBlock,
       CalendarBlock,
+      ExcalidrawBlock,
       HttpResult,
       AgentMention,
       AgentOutput,

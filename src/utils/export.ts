@@ -13,6 +13,11 @@ turndown.addRule('strikethrough', {
   replacement: (content) => `~~${content}~~`,
 })
 
+turndown.addRule('excalidraw', {
+  filter: (node) => node instanceof HTMLElement && node.hasAttribute('data-excalidraw-block'),
+  replacement: () => '\n\n[drawing]\n\n',
+})
+
 export function htmlToMarkdown(html: string): string {
   return turndown.turndown(html || '')
 }

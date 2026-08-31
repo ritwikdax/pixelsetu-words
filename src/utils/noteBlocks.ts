@@ -3,6 +3,7 @@ import type { JSONContent } from '@tiptap/core'
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { currentCalendarAttrs } from '../extensions/calendarBlock'
 import { EMPTY_CURL_ATTRS } from '../extensions/curlBlock'
+import { EMPTY_EXCALIDRAW_ATTRS } from '../extensions/excalidrawBlock'
 import { isAgentOutputNode } from '../extensions/paragraphWithAgentOutput'
 import {
   fetchHttpResult,
@@ -282,6 +283,15 @@ function specToContent(spec: NoteBlockSpec): JSONContent {
         },
       }
     }
+    case 'excalidraw':
+    case 'excalidrawblock':
+    case 'draw':
+    case 'drawing':
+    case 'diagram':
+      return {
+        type: 'excalidrawBlock',
+        attrs: { ...EMPTY_EXCALIDRAW_ATTRS },
+      }
     case 'image':
     case 'img': {
       const src = String(spec.src ?? spec.url ?? '')
@@ -293,7 +303,7 @@ function specToContent(spec: NoteBlockSpec): JSONContent {
     }
     default:
       throw new Error(
-        `Unsupported block type "${spec.type}". Use paragraph, heading, blockquote, codeBlock, bulletList, numberedList, todoList, divider, calendar, curl, or image.`,
+        `Unsupported block type "${spec.type}". Use paragraph, heading, blockquote, codeBlock, bulletList, numberedList, todoList, divider, calendar, curl, drawing, or image.`,
       )
   }
 }
@@ -515,6 +525,10 @@ function describeBlock(block: IndexedBlock): string {
     const method = String(node.attrs.method ?? 'GET')
     const url = String(node.attrs.url ?? '')
     return `[${id}] curl${flag} | ${method} ${url || '(not configured)'}`
+  }
+  if (type === 'excalidrawBlock') {
+    const configured = Boolean(node.attrs.configured)
+    return `[${id}] drawing${flag} | ${configured ? 'sketch' : 'empty'}`
   }
   if (type === 'httpResult') {
     return `[${id}] fetched data${flag}`

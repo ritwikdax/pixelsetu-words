@@ -97,8 +97,13 @@ export function cancelPageJump() {
   resetPageJump()
 }
 
+function isExcalidrawEditorOpen() {
+  return Boolean(document.querySelector('.excalidraw-editor-overlay'))
+}
+
 /** True when this key combo is handled by the app (and should not reach the browser). */
 export function matchesAppShortcut(e: KeyboardEvent): boolean {
+  if (isExcalidrawEditorOpen()) return false
   const mod = isMod(e)
   const inTerminal =
     isTypingTarget(e.target) &&
@@ -132,6 +137,7 @@ export function matchesAppShortcut(e: KeyboardEvent): boolean {
 }
 
 export function handleAppShortcut(e: KeyboardEvent, actions: ShortcutActions): boolean {
+  if (isExcalidrawEditorOpen()) return false
   const mod = isMod(e)
   const inTerminal =
     isTypingTarget(e.target) &&

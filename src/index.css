@@ -2675,6 +2675,140 @@ body {
   border-radius: 999px;
 }
 
+/* ─── Excalidraw drawing block ─── */
+
+.tiptap-editor .excalidraw-block {
+  margin: 0.9em 0 1.2em;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  color: var(--text);
+}
+
+.tiptap-editor .excalidraw-block.is-selected {
+  outline: none;
+  box-shadow: inset 3px 0 0 var(--accent);
+  padding-left: 0.75rem;
+}
+
+.excalidraw-block-open {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+}
+
+.excalidraw-block[data-excalidraw-theme='dark'] .excalidraw-block-open {
+  background: #1e1e1e;
+}
+
+.excalidraw-block.is-empty .excalidraw-block-open {
+  border-style: dashed;
+}
+
+.excalidraw-block-open:hover,
+.excalidraw-block-open:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.excalidraw-block-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 8.5rem;
+  color: var(--text-muted);
+  font-size: 0.95em;
+}
+
+.excalidraw-block[data-excalidraw-theme='dark'] .excalidraw-block-placeholder {
+  color: #222;
+  background: #ffffff;
+  filter: invert(93%) hue-rotate(180deg);
+}
+
+.excalidraw-block-preview {
+  display: block;
+  width: 100%;
+  max-height: 22rem;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.excalidraw-block[data-excalidraw-theme='dark'] .excalidraw-block-preview {
+  background: #ffffff;
+  filter: invert(93%) hue-rotate(180deg);
+}
+
+.excalidraw-editor-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  color: var(--text);
+}
+
+.excalidraw-editor-overlay[data-excalidraw-theme='dark'] {
+  background: #1e1e1e;
+}
+
+.excalidraw-editor-chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--panel-text);
+  z-index: 1;
+}
+
+.excalidraw-editor-title {
+  margin: 0;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+.excalidraw-editor-done {
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 0.4em 0.9em;
+  cursor: pointer;
+}
+
+.excalidraw-editor-done:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.excalidraw-editor-canvas {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: inherit;
+}
+
+.excalidraw-editor-canvas .excalidraw {
+  height: 100%;
+}
+
 /* ─── HTTP result (Bro fetchUrl) ─── */
 
 .tiptap-editor .http-result {
