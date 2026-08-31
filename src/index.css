@@ -1837,6 +1837,18 @@ body {
   background: var(--code-bg);
 }
 
+.page-title-input:read-only,
+.page-title-input:read-only:hover,
+.page-title-input:read-only:focus {
+  color: var(--text-muted);
+  background: transparent;
+  cursor: default;
+}
+
+.editor-page[data-locked='true'] .editor-surface :is(button, input, textarea, select, [role='button']) {
+  pointer-events: none;
+}
+
 .page-meta {
   display: flex;
   align-items: center;
@@ -4167,6 +4179,22 @@ body {
 .status-saved {
   color: var(--terminal-green);
   opacity: 1;
+}
+
+.status-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-lock.is-locked {
+  color: var(--text);
+  opacity: 1;
+}
+
+.status-lock-icon {
+  flex-shrink: 0;
+  display: block;
 }
 
 /* ─── Dev Terminal ─── */

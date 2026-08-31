@@ -39,7 +39,10 @@ function App() {
 
   const updatePageContent = useCallback((pageId: string, content: string) => {
     setPages((prev) =>
-      prev.map((p) => (p.id === pageId ? { ...p, content, updatedAt: Date.now() } : p)),
+      prev.map((p) => {
+        if (p.id !== pageId || p.locked) return p
+        return { ...p, content, updatedAt: Date.now() }
+      }),
     )
   }, [])
 
@@ -65,7 +68,16 @@ function App() {
 
   const renamePage = useCallback((pageId: string, title: string) => {
     setPages((prev) =>
-      prev.map((p) => (p.id === pageId ? { ...p, title, updatedAt: Date.now() } : p)),
+      prev.map((p) => {
+        if (p.id !== pageId || p.locked) return p
+        return { ...p, title, updatedAt: Date.now() }
+      }),
+    )
+  }, [])
+
+  const setPageLocked = useCallback((pageId: string, locked: boolean) => {
+    setPages((prev) =>
+      prev.map((p) => (p.id === pageId ? { ...p, locked, updatedAt: Date.now() } : p)),
     )
   }, [])
 
@@ -227,6 +239,7 @@ function App() {
         onCreatePage={createNewPage}
         onDeletePage={deletePage}
         onRenamePage={renamePage}
+        onSetPageLocked={setPageLocked}
         getPageContent={(id) => pagesRef.current.find((p) => p.id === id)?.content ?? ''}
         theme={theme}
         onSetTheme={setTheme}

@@ -257,13 +257,14 @@ export function Editor({
   const workersReady = predictionReady
 
   const startTitleEdit = useCallback(() => {
+    if (page.locked) return
     setDraftTitle(page.title)
     requestAnimationFrame(() => {
       const input = titleInputRef.current
       input?.focus()
       input?.select()
     })
-  }, [page.title])
+  }, [page.locked, page.title])
 
   const cancelTitleEdit = useCallback(() => {
     setDraftTitle(page.title)
@@ -272,12 +273,12 @@ export function Editor({
 
   const commitTitleEdit = useCallback(() => {
     const trimmed = draftTitle.trim()
-    if (trimmed && trimmed !== page.title) {
+    if (trimmed && trimmed !== page.title && !page.locked) {
       onRenameTitle(trimmed)
     } else {
       setDraftTitle(page.title)
     }
-  }, [draftTitle, onRenameTitle, page.title])
+  }, [draftTitle, onRenameTitle, page.locked, page.title])
 
   useEffect(() => {
     onRegisterEditTitle(startTitleEdit)
@@ -1039,6 +1040,7 @@ export function Editor({
       CodeBlockHighlight,
     ],
     content: page.content,
+    editable: !page.locked,
     editorProps: {
       attributes: {
         class: 'tiptap-editor',
@@ -1184,6 +1186,11 @@ export function Editor({
   })
 
   useEffect(() => {
+    if (!editor) return
+    editor.setEditable(!page.locked)
+  }, [editor, page.locked])
+
+  useEffect(() => {
     editorRef.current = editor ?? null
   }, [editor])
 
@@ -1232,6 +1239,7 @@ export function Editor({
         className="editor-page"
         data-export-target
         data-orientation={orientation}
+        data-locked={page.locked ? 'true' : undefined}
         ref={pageRef}
       >
         <header className="page-header">
@@ -1239,7 +1247,11 @@ export function Editor({
             ref={titleInputRef}
             className="page-title-input"
             value={draftTitle}
-            onChange={(event) => setDraftTitle(event.target.value)}
+            readOnly={Boolean(page.locked)}
+            onChange={(event) => {
+              if (page.locked) return
+              setDraftTitle(event.target.value)
+            }}
             onBlur={commitTitleEdit}
             onKeyDown={(event) => {
               if (event.key === 'ArrowDown' && !event.shiftKey && !event.ctrlKey && !event.metaKey) {

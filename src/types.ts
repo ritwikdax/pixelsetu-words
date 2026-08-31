@@ -7,6 +7,7 @@ export interface DocumentPage {
   createdAt: number
   updatedAt: number
   orientation?: PageOrientation
+  locked?: boolean
 }
 
 export type { PageOrientation } from './utils/pageOrientation'

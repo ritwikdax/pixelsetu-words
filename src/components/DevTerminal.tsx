@@ -17,6 +17,7 @@ interface DevTerminalProps {
   onCreatePage: (title?: string) => DocumentPage
   onDeletePage: (id: string) => void
   onRenamePage: (id: string, title: string) => void
+  onSetPageLocked: (id: string, locked: boolean) => void
   getPageContent: (id: string) => string
   theme: Theme
   onSetTheme: (theme: Theme) => void
@@ -38,6 +39,7 @@ export function DevTerminal({
   onCreatePage,
   onDeletePage,
   onRenamePage,
+  onSetPageLocked,
   getPageContent,
   theme,
   onSetTheme,
@@ -100,6 +102,7 @@ export function DevTerminal({
           onSelectPage,
           onDeletePage,
           onRenamePage,
+          onSetPageLocked,
           onSetTheme,
           onCycleTheme,
           onClose,
@@ -122,6 +125,7 @@ export function DevTerminal({
       onCycleTheme,
       onDeletePage,
       onRenamePage,
+      onSetPageLocked,
       onSelectPage,
       onSetTheme,
       pages,

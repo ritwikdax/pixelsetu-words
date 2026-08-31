@@ -34,6 +34,7 @@ export function loadPages(): DocumentPage[] {
           ...page,
           createdAt: page.createdAt ?? page.updatedAt,
           orientation: normalizePageOrientation(page.orientation),
+          locked: Boolean(page.locked),
         }))
       }
     }

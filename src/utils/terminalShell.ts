@@ -33,6 +33,8 @@ export const HELP_LINES = [
   '  mv <old> <new>      — rename a page',
   '  wc [name]           — word / line / character count',
   '  export md | pdf     — export the current page',
+  '  lock / freeze [.|id] — freeze a note as readonly',
+  '  unlock / reheat [.|id] — thaw a note so it is editable again',
   '',
   'shell',
   '  whoami, hostname, date, uname, echo, history, env, which',
@@ -78,6 +80,10 @@ const KNOWN_COMMANDS = [
   'mv',
   'wc',
   'export',
+  'lock',
+  'freeze',
+  'unlock',
+  'reheat',
   'whoami',
   'hostname',
   'date',
@@ -112,6 +118,8 @@ const ALIASES: Record<string, string> = {
   edit: 'nano',
   about: 'neofetch',
   fetch: 'neofetch',
+  freeze: 'lock',
+  reheat: 'unlock',
 }
 
 const FORTUNES = [
@@ -137,6 +145,7 @@ export interface ShellContext {
   onSelectPage: (id: string) => void
   onDeletePage: (id: string) => void
   onRenamePage: (id: string, title: string) => void
+  onSetPageLocked: (id: string, locked: boolean) => void
   onSetTheme: (theme: Theme) => void
   onCycleTheme: () => void
   onClose: () => void
@@ -211,7 +220,7 @@ function pagePath(page: DocumentPage) {
 }
 
 function resolvePage(ctx: ShellContext, query?: string): DocumentPage | undefined {
-  if (!query) return ctx.activePage
+  if (!query || query === '.') return ctx.activePage
   return ctx.findPage(query)
 }
 
@@ -370,6 +379,7 @@ export async function runShellCommand(
       io.print('output', `PWD=${ctx.activePage ? pagePath(ctx.activePage) : HOME}`)
       io.print('output', `THEME=${ctx.theme}`)
       io.print('output', `PAGES=${ctx.pages.length}`)
+      io.print('output', `LOCKED=${ctx.activePage?.locked ? '1' : '0'}`)
       io.print('output', `SHELL=pixelsetu-bash`)
       break
 
@@ -398,12 +408,14 @@ export async function runShellCommand(
           const last = index === ctx.pages.length - 1
           const branch = last ? '└──' : '├──'
           const marker = page.id === ctx.activePageId ? '  ← you are here' : ''
-          io.print('output', `${branch} ${page.title}${marker}`)
+          const frozen = page.locked ? ' [ro]' : ''
+          io.print('output', `${branch} ${page.title}${frozen}${marker}`)
         })
       } else {
         ctx.pages.forEach((page) => {
           const marker = page.id === ctx.activePageId ? '→' : ' '
-          io.print('output', `${marker} ${page.id.slice(0, 8)}  ${page.title}`)
+          const frozen = page.locked ? '  [ro]' : ''
+          io.print('output', `${marker} ${page.id.slice(0, 8)}  ${page.title}${frozen}`)
         })
       }
       break
@@ -512,9 +524,39 @@ export async function runShellCommand(
       const page = ctx.findPage(oldName)
       if (!page) {
         io.print('error', `mv: no such note: ${oldName}`)
+      } else if (page.locked) {
+        io.print('error', `mv: "${page.title}" is frozen — unlock it first`)
       } else {
         ctx.onRenamePage(page.id, newName)
         io.print('success', `${HOME}/${oldName} -> ${HOME}/${newName}`)
+      }
+      break
+    }
+
+    case 'lock': {
+      const query = args.join(' ')
+      const page = resolvePage(ctx, query || undefined)
+      if (!page) {
+        io.print('error', query ? `lock: no such note: ${query}` : 'lock: no current note')
+      } else if (page.locked) {
+        io.print('output', `"${page.title}" is already frozen (readonly)`)
+      } else {
+        ctx.onSetPageLocked(page.id, true)
+        io.print('success', `chmod -w ${pagePath(page)} — frozen, readonly`)
+      }
+      break
+    }
+
+    case 'unlock': {
+      const query = args.join(' ')
+      const page = resolvePage(ctx, query || undefined)
+      if (!page) {
+        io.print('error', query ? `unlock: no such note: ${query}` : 'unlock: no current note')
+      } else if (!page.locked) {
+        io.print('output', `"${page.title}" is already writable`)
+      } else {
+        ctx.onSetPageLocked(page.id, false)
+        io.print('success', `chmod +w ${pagePath(page)} — thawed, editable`)
       }
       break
     }
