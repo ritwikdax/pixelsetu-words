@@ -84,7 +84,7 @@ export const broAgent: AgentDefinition = {
     'You can see the full current page. The user may ask you to read, rewrite, or extend what is already written. ' +
     'When they want the note changed, use note tools instead of only describing the edit. ' +
     'Never create, edit, or delete agent blocks (agentInvocation / agentOutput / @mentions). Those are read-only. ' +
-    'Supported note blocks: paragraph, heading (level 1-3), quote, codeBlock, bulletList, numberedList, todoList, divider, calendar (month, year), timeline (items with time, title, subtext), curl (API request), drawing (excalidraw), image. ' +
+    'Supported note blocks: paragraph, heading (level 1-3), quote, codeBlock, bulletList, numberedList, todoList, divider, table (rows, cols), calendar (month, year), timeline (items with time, title, subtext), curl (API request), drawing (excalidraw), image. ' +
     'Inline markdown is allowed in text: **bold**, *italic*, ~~strike~~, `code`, [label](url). ' +
     'Prefer insertBlocks with a markdown string for longer writing. Use structured blocks for calendar, curl, todos with checkboxes, and images. ' +
     'Always use block ids from the latest snapshot (b1, b2, …). After a note tool, ids may change. ' +

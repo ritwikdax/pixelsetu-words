@@ -2,6 +2,7 @@ import type { Editor } from '@tiptap/core'
 import type { JSONContent } from '@tiptap/core'
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { currentCalendarAttrs } from '../extensions/calendarBlock'
+import { createTableJSON } from '../extensions/table'
 import { EMPTY_CURL_ATTRS } from '../extensions/curlBlock'
 import { EMPTY_EXCALIDRAW_ATTRS } from '../extensions/excalidrawBlock'
 import {
@@ -60,6 +61,8 @@ export interface NoteBlockSpec {
   checked?: boolean
   month?: number
   year?: number
+  rows?: number
+  cols?: number
 }
 
 interface IndexedBlock {
@@ -267,6 +270,9 @@ function specToContent(spec: NoteBlockSpec): JSONContent {
     case 'hr':
     case 'horizontalrule':
       return { type: 'horizontalRule' }
+    case 'table': {
+      return createTableJSON(Number(spec.rows ?? 3), Number(spec.cols ?? 3))
+    }
     case 'calendar':
     case 'calendarblock': {
       const now = currentCalendarAttrs(true)
@@ -336,7 +342,7 @@ function specToContent(spec: NoteBlockSpec): JSONContent {
     }
     default:
       throw new Error(
-        `Unsupported block type "${spec.type}". Use paragraph, heading, blockquote, codeBlock, bulletList, numberedList, todoList, divider, calendar, curl, drawing, or image.`,
+        `Unsupported block type "${spec.type}". Use paragraph, heading, blockquote, codeBlock, bulletList, numberedList, todoList, divider, table, calendar, curl, drawing, or image.`,
       )
   }
 }
@@ -548,6 +554,16 @@ function describeBlock(block: IndexedBlock): string {
   }
   if (type === 'horizontalRule') {
     return `[${id}] divider${flag}`
+  }
+  if (type === 'table') {
+    const rows = node.childCount
+    const cols = node.firstChild?.childCount ?? 0
+    return `[${id}] table${flag} | ${rows}×${cols}`
+  }
+  if (type === 'tableSetup') {
+    const rows = Number(node.attrs.rows)
+    const cols = Number(node.attrs.cols)
+    return `[${id}] table setup${flag} | ${rows}×${cols}`
   }
   if (type === 'calendarBlock') {
     const month = Number(node.attrs.month)

@@ -7,7 +7,7 @@ export const WELCOME_PAGE_HTML = `
 <p>Keep typing. A faint ghost word appears after you finish a word — press <strong>Tab</strong> to take it. After two letters, a popover lists completions; use arrows and Enter.</p>
 
 <h2>Slash commands</h2>
-<p>On an empty line, type <code>/</code> for headings, lists, quotes, code, to-dos, dividers, calendars, and API blocks. Type <code>/h1</code>, <code>/calendar</code>, or <code>/curl</code> to filter.</p>
+<p>On an empty line, type <code>/</code> for headings, lists, quotes, code, to-dos, tables, dividers, calendars, and API blocks. Type <code>/h1</code>, <code>/table</code>, <code>/calendar</code>, or <code>/curl</code> to filter.</p>
 
 <h1>Heading 1</h1>
 <h2>Heading 2</h2>
@@ -54,6 +54,22 @@ export const WELCOME_PAGE_HTML = `
 <p>Ask Bro to GET a link — <code>@bro</code> get https://jsonplaceholder.typicode.com/todos/1 — and the JSON lands as a card or table, not a raw dump.</p>
 <div data-http-result="" data-content-type="application/json" data-body="{&quot;userId&quot;:1,&quot;id&quot;:1,&quot;title&quot;:&quot;Buy milk&quot;,&quot;completed&quot;:false}"></div>
 <div data-http-result="" data-content-type="application/json" data-body="[{&quot;id&quot;:1,&quot;name&quot;:&quot;Ada Lovelace&quot;,&quot;role&quot;:&quot;Engineer&quot;},{&quot;id&quot;:2,&quot;name&quot;:&quot;Grace Hopper&quot;,&quot;role&quot;:&quot;Scientist&quot;}]"></div>
+<p></p>
+
+<h2>Table</h2>
+<p>Insert <code>/table</code>. Arrow keys set rows and columns, Enter drops the table in. Tab moves between cells — at the last cell it adds a row. Ctrl+Shift+arrows add rows or columns; Ctrl+Shift+Backspace deletes a row.</p>
+<table class="editor-table">
+  <tbody>
+    <tr>
+      <th class="editor-table-header"><p>Name</p></th>
+      <th class="editor-table-header"><p>Role</p></th>
+    </tr>
+    <tr>
+      <td class="editor-table-cell"><p>Ada</p></td>
+      <td class="editor-table-cell"><p>Engineer</p></td>
+    </tr>
+  </tbody>
+</table>
 <p></p>
 
 <h2>Calendar</h2>

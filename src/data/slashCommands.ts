@@ -103,6 +103,15 @@ export const slashCommands: SlashCommand[] = [
     apply: (chain) => chain.insertCalendarBlock(),
   },
   {
+    id: 'table',
+    label: 'Table',
+    description: 'Rows and columns you can type in',
+    keywords: ['table', 'grid', 'cells', 'spreadsheet'],
+    icon: '⊞',
+    category: 'blocks',
+    apply: (chain) => chain.insertTableSetup(),
+  },
+  {
     id: 'timeline',
     label: 'Timeline',
     description: 'Vertical events with time, title, and subtext',

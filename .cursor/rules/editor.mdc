@@ -8,7 +8,7 @@ alwaysApply: false
 
 Single editor in `Editor.tsx`. StarterKit with `codeBlock: false`, `paragraph: false` (replaced by `ParagraphWithAgentOutput`). Register new extensions in the `useEditor({ extensions })` array.
 
-Custom nodes: `agentMention`, `agentOutput` + `agentOutputLock`, `curlBlock` (atom HTTP client), `todo`. Marks/helpers: `EmojiImage`, `EmojiReplacer`, `DocumentLink`, `ColorPreview`, `CodeBlockHighlight`, `EditorShortcuts`.
+Custom nodes: `agentMention`, `agentOutput` + `agentOutputLock`, `curlBlock` (atom HTTP client), `todo`, `table` + `tableSetup`. Marks/helpers: `EmojiImage`, `EmojiReplacer`, `DocumentLink`, `ColorPreview`, `CodeBlockHighlight`, `EditorShortcuts`.
 
 - Slash `/`: `src/data/slashCommands.ts` + `SlashCommandPicker`. Agent `@`: `AgentPicker`. Emoji `:shortcode:`: `EmojiPicker` / `customEmojiGifs.ts`.
 - `agentOutput` is isolating, locked, not editable; keep the caret out of it (`agentOutputLock`, `ensureCursorInEditableParagraph`).

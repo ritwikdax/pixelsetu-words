@@ -13,7 +13,7 @@ Stack: React 18, Vite 5, TypeScript strict, TipTap 2, no test runner, no router,
 
 - `src/App.tsx` — pages, theme, terminal/shortcuts/theme dialogs, persist via `utils/storage.ts`
 - `src/components/Editor.tsx` — TipTap instance, pickers, agent runs, suggestions (large; read only the section you need)
-- `src/extensions/` — TipTap nodes/marks (`curlBlock`, `agentMention`, `agentOutput`, `todo`, emoji, links)
+- `src/extensions/` — TipTap nodes/marks (`curlBlock`, `agentMention`, `agentOutput`, `todo`, `table`/`tableSetup`, emoji, links)
 - `src/agents/` — `AgentDefinition`s + `registry.ts` (list: bro, weather, calculator, time)
 - `src/runtime/` — `harness.ts` (plan/tool loop), `gemini.ts` (`gemini-3.5-flash-lite`), `keyStore.ts` (IndexedDB AES-GCM)
 - `src/workers/` + `src/hooks/use*Worker.ts` — dictionary, prediction, agent (module workers)

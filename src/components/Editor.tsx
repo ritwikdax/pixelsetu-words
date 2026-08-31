@@ -22,6 +22,13 @@ import { CodeBlockHighlight } from '../extensions/codeBlockHighlight'
 import { CalendarBlock } from '../extensions/calendarBlock'
 import { CurlBlock } from '../extensions/curlBlock'
 import { TimelineBlock } from '../extensions/timelineBlock'
+import {
+  EditorTable,
+  EditorTableCell,
+  EditorTableHeader,
+  EditorTableRow,
+  TableSetup,
+} from '../extensions/table'
 import { ExcalidrawBlock } from '../extensions/excalidrawBlock'
 import { HttpResult } from '../extensions/httpResult'
 import { AgentMention } from '../extensions/agentMention'
@@ -1018,6 +1025,11 @@ export function Editor({
       TodoTaskItem,
       CurlBlock,
       CalendarBlock,
+      EditorTable,
+      EditorTableRow,
+      EditorTableHeader,
+      EditorTableCell,
+      TableSetup,
       TimelineBlock,
       ExcalidrawBlock,
       HttpResult,
@@ -1125,6 +1137,16 @@ export function Editor({
             ed.commands.setHardBreak()
           }
           return true
+        }
+
+        if (
+          ed.isActive('table') &&
+          event.key === 'Tab' &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          !event.altKey
+        ) {
+          return false
         }
 
         if (handleSuggestionKeyDownRef.current(ed, event)) {
