@@ -11,6 +11,8 @@ interface InlineWordSuggestionProps {
   top: number
   left: number
   lineHeight: number
+  fontSize: string
+  fontWeight: string
 }
 
 export function InlineWordSuggestion({
@@ -23,6 +25,8 @@ export function InlineWordSuggestion({
   top,
   left,
   lineHeight,
+  fontSize,
+  fontWeight,
 }: InlineWordSuggestionProps) {
   if (!open) return null
   if (loading && suggestions.length === 0) return null
@@ -41,6 +45,8 @@ export function InlineWordSuggestion({
         left,
         height: lineHeight > 0 ? lineHeight : undefined,
         lineHeight: lineHeight > 0 ? `${lineHeight}px` : undefined,
+        fontSize: fontSize || undefined,
+        fontWeight: fontWeight || undefined,
       }}
       aria-hidden="true"
     >

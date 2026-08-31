@@ -94,6 +94,8 @@ interface SuggestionState {
   top: number
   left: number
   lineHeight: number
+  fontSize: string
+  fontWeight: string
   loading: boolean
   mode: 'prefix' | 'next-word'
 }
@@ -109,6 +111,8 @@ const CLOSED_SUGGESTIONS: SuggestionState = {
   top: 0,
   left: 0,
   lineHeight: 0,
+  fontSize: '',
+  fontWeight: '',
   loading: false,
   mode: 'prefix',
 }
@@ -444,6 +448,8 @@ export function Editor({
         top: coords.top,
         left: coords.left,
         lineHeight: coords.lineHeight,
+        fontSize: coords.fontSize,
+        fontWeight: coords.fontWeight,
         loading: previous.length === 0,
         mode: context.mode,
       })
@@ -482,6 +488,8 @@ export function Editor({
         top: latestCoords.top,
         left: latestCoords.left,
         lineHeight: latestCoords.lineHeight,
+        fontSize: latestCoords.fontSize,
+        fontWeight: latestCoords.fontWeight,
         loading: false,
         mode: context.mode,
       })
@@ -1271,6 +1279,8 @@ export function Editor({
             top={suggestions.top}
             left={suggestions.left}
             lineHeight={suggestions.lineHeight}
+            fontSize={suggestions.fontSize}
+            fontWeight={suggestions.fontWeight}
           />
           <WordSuggestions
             open={suggestions.open && suggestions.ui === 'popover'}

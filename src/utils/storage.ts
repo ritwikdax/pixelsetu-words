@@ -1,3 +1,4 @@
+import { WELCOME_PAGE_HTML, WELCOME_PAGE_TITLE } from '../data/welcomePage'
 import type { DocumentPage } from '../types'
 import { DEFAULT_PAGE_ORIENTATION, normalizePageOrientation } from './pageOrientation'
 
@@ -13,6 +14,13 @@ export function createPage(title?: string): DocumentPage {
     createdAt: now,
     updatedAt: now,
     orientation: DEFAULT_PAGE_ORIENTATION,
+  }
+}
+
+export function createWelcomePage(): DocumentPage {
+  return {
+    ...createPage(WELCOME_PAGE_TITLE),
+    content: WELCOME_PAGE_HTML,
   }
 }
 
@@ -32,7 +40,7 @@ export function loadPages(): DocumentPage[] {
   } catch {
     // ignore corrupt storage
   }
-  return [createPage('untitled')]
+  return [createWelcomePage()]
 }
 
 export function savePages(pages: DocumentPage[]) {

@@ -176,8 +176,11 @@ export function analyzeContext(state: EditorState): AnalyzedContext | null {
   }
 
   if (partial.length === 0 && afterBoundary) {
-    const sentenceStart = isAtEmptyLineStart(text, offset) || isAfterSentenceBoundary(text, offset)
-    const completedWords = sentenceStart ? [] : extractPreviousWords(text, offset)
+    if (isAtEmptyLineStart(text, offset) || isAfterSentenceBoundary(text, offset)) {
+      return null
+    }
+
+    const completedWords = extractPreviousWords(text, offset)
     const { bigramKey, trigramKey, fourgramKey } = buildContextKeys(completedWords)
 
     return {

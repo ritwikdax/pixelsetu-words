@@ -41,6 +41,30 @@ export const THEMES = [
     description: 'Rich indigo night with violet accents',
     preview: { bg: '#0f0a1a', page: '#1a1229', accent: '#a78bfa' },
   },
+  {
+    id: 'ocean',
+    label: 'Ocean',
+    description: 'Deep teal dusk with seafoam highlights',
+    preview: { bg: '#0b1c22', page: '#12262e', accent: '#2dd4bf' },
+  },
+  {
+    id: 'ember',
+    label: 'Ember',
+    description: 'Warm charcoal with copper glow',
+    preview: { bg: '#1c1410', page: '#271c16', accent: '#f0a46a' },
+  },
+  {
+    id: 'matcha',
+    label: 'Matcha',
+    description: 'Soft tea-green paper for calm writing',
+    preview: { bg: '#eef3e4', page: '#f7faf0', accent: '#4d7c0f' },
+  },
+  {
+    id: 'dracula',
+    label: 'Dracula',
+    description: 'Velvet purple night with magenta accents',
+    preview: { bg: '#191a2e', page: '#282a36', accent: '#bd93f9' },
+  },
 ] as const
 
 export type Theme = (typeof THEMES)[number]['id']

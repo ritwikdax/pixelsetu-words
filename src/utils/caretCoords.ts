@@ -4,6 +4,31 @@ export interface CaretClientRect {
   top: number
   left: number
   height: number
+  fontSize: string
+  fontWeight: string
+}
+
+function getCaretTypography(editor: Editor): { fontSize: string; fontWeight: string } {
+  const { view } = editor
+  const { from } = view.state.selection
+
+  try {
+    const dom = view.domAtPos(from)
+    const el =
+      dom.node.nodeType === Node.TEXT_NODE
+        ? dom.node.parentElement
+        : dom.node instanceof HTMLElement
+          ? dom.node
+          : null
+    if (el) {
+      const style = window.getComputedStyle(el)
+      return { fontSize: style.fontSize, fontWeight: style.fontWeight }
+    }
+  } catch {
+    // keep defaults
+  }
+
+  return { fontSize: '', fontWeight: '' }
 }
 
 export function getCaretClientRect(editor: Editor): CaretClientRect {
@@ -39,7 +64,8 @@ export function getCaretClientRect(editor: Editor): CaretClientRect {
     // keep ProseMirror coords
   }
 
-  return { top, left, height }
+  const { fontSize, fontWeight } = getCaretTypography(editor)
+  return { top, left, height, fontSize, fontWeight }
 }
 
 export function getSurfaceCaretCoords(
@@ -57,5 +83,7 @@ export function getSurfaceCaretCoords(
         : rect.top + rect.height - surfaceRect.top + 4,
     left: rect.left - surfaceRect.left,
     lineHeight: rect.height,
+    fontSize: rect.fontSize,
+    fontWeight: rect.fontWeight,
   }
 }

@@ -44,7 +44,7 @@ export const HELP_LINES = [
   '  cowsay [text]       — a cow, obviously',
   '',
   'app',
-  '  theme <name|next>   — light, dark, sepia, nord, forest, rose, midnight',
+  '  theme <name|next>   — light, dark, sepia, nord, forest, rose, midnight, ocean, ember, matcha, dracula',
   '  shortcuts           — keyboard shortcuts',
   '  memory stats|clear  — learned word patterns',
   '  gemini --set-key | --status | --clear',
