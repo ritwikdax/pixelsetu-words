@@ -142,27 +142,31 @@ export function insertSlashCommand(
   command.apply(chain, editor).run()
 }
 
+function slashCommandCategoryLabel(category: SlashCommandCategory): string {
+  if (category === 'blocks') return 'Basic blocks'
+  if (category === 'tools') return 'Tools'
+  if (category === 'lists') return 'Lists'
+  return 'Inline'
+}
+
 export function groupSlashCommandItems(
   items: SlashCommandPickerItem[],
 ): { category: SlashCommandCategory; label: string; items: SlashCommandPickerItem[] }[] {
-  const groups = new Map<SlashCommandCategory, SlashCommandPickerItem[]>()
+  const groups: { category: SlashCommandCategory; label: string; items: SlashCommandPickerItem[] }[] = []
 
   for (const item of items) {
-    const list = groups.get(item.command.category) ?? []
-    list.push(item)
-    groups.set(item.command.category, list)
+    const last = groups[groups.length - 1]
+    if (last && last.category === item.command.category) {
+      last.items.push(item)
+      continue
+    }
+
+    groups.push({
+      category: item.command.category,
+      label: slashCommandCategoryLabel(item.command.category),
+      items: [item],
+    })
   }
 
-  return [...groups.entries()].map(([category, groupItems]) => ({
-    category,
-    label:
-      category === 'blocks'
-        ? 'Basic blocks'
-        : category === 'tools'
-          ? 'Tools'
-          : category === 'lists'
-            ? 'Lists'
-            : 'Inline',
-    items: groupItems,
-  }))
+  return groups
 }

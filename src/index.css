@@ -3244,7 +3244,10 @@ body {
   cursor: pointer;
 }
 
-.slash-command-item:hover,
+.slash-command-item:focus {
+  outline: none;
+}
+
 .slash-command-item.active {
   background: var(--panel-active-bg);
   color: var(--panel-text-active);
@@ -4380,14 +4383,13 @@ body {
     box-shadow 0.15s ease;
 }
 
-.theme-picker-card:hover,
+.theme-picker-card:focus {
+  outline: none;
+}
+
 .theme-picker-card.active {
   border-color: var(--accent);
   background: var(--panel-active-bg);
-}
-
-.theme-picker-card.selected {
-  box-shadow: inset 0 0 0 1px var(--accent);
 }
 
 .theme-picker-preview {

@@ -1263,6 +1263,11 @@ export function Editor({
               insertSlashCommand(ed, item.command, slashCommandPicker.from, slashCommandPicker.to)
               closeSlashCommandPicker()
             }}
+            onHighlight={(index) => {
+              const state = slashCommandPickerRef.current
+              if (!state.open || state.selectedIndex === index) return
+              updateSlashCommandPickerRef({ ...state, selectedIndex: index })
+            }}
           />
           <AgentPicker
             open={agentPicker.open}

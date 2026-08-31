@@ -156,9 +156,13 @@ export function ThemePickerDialog({
                 id={`theme-option-${entry.id}`}
                 type="button"
                 role="option"
+                tabIndex={-1}
                 aria-selected={selected}
                 className={`theme-picker-card ${active ? 'active' : ''} ${selected ? 'selected' : ''}`}
                 onClick={() => onSelectTheme(entry.id)}
+                onMouseMove={() => {
+                  if (index !== activeIndex) setActiveIndex(index)
+                }}
                 onFocus={() => setActiveIndex(index)}
               >
                 <span className="theme-picker-preview" aria-hidden="true">

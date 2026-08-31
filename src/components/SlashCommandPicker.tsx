@@ -12,6 +12,7 @@ interface SlashCommandPickerProps {
   top: number
   left: number
   onSelect: (item: SlashCommandPickerItem) => void
+  onHighlight: (index: number) => void
 }
 
 export function SlashCommandPicker({
@@ -22,6 +23,7 @@ export function SlashCommandPicker({
   top,
   left,
   onSelect,
+  onHighlight,
 }: SlashCommandPickerProps) {
   const listboxId = useId()
   const activeOptionId =
@@ -78,9 +80,13 @@ export function SlashCommandPicker({
                     key={command.id}
                     type="button"
                     id={`${listboxId}-option-${index}`}
+                    tabIndex={-1}
                     className={`slash-command-item ${active ? 'active' : ''}`}
                     role="option"
                     aria-selected={active}
+                    onMouseMove={() => {
+                      if (index !== selectedIndex) onHighlight(index)
+                    }}
                     onMouseDown={(event) => {
                       event.preventDefault()
                       onSelect(item)
